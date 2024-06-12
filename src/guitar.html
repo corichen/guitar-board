@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>吉他指板把位音阶图</title>
+    <style>
+        .optionSelected {
+            color: white;
+            background-color: #07E;
+        }
+        option {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<script src="vue.global.js"></script>
+<script src="GuitarPlayer.js"></script>
+
+<div id="app">
+
+    <table>
+        <tr>
+            <td>
+                <select v-model.number="mode" style="height: 30px;margin-left: 20px;" @change="changeMode($event.target.value)">
+                    <option :value="1">显示唱名</option>
+                    <option :value="2">显示音名</option>
+                    <option :value="3">显示背景</option>
+                    <option :value="4">听音辨位</option>
+                    <option :value="5">位置认音</option>
+                    <option :value="0">显示指板</option>
+                </select>
+            </td>
+            <td>
+                <select style="height: 30px;margin-left: 10px" v-model="key" @change="changeKey($event.target.value)">
+                    <option value="C">C调</option>
+                    <option value="#C">#C调</option>
+                    <option value="D">D调</option>
+                    <option value="bE">bE调</option>
+                    <option value="E">E调</option>
+                    <option value="F">F调</option>
+                    <option value="#F">#F调</option>
+                    <option value="G">G调</option>
+                    <option value="bA">bA调</option>
+                    <option value="A">A调</option>
+                    <option value="bB">bB调</option>
+                    <option value="B">B调</option>
+                </select>
+            </td>
+            <td>
+                <div style="margin-left: 10px;display: inline-flex;flex-direction: row;border: 1px solid #aaa;border-radius: 4px;overflow: hidden;user-select: none;">
+                    <div style="width: 60px;height: 30px;display: flex;align-items: center;justify-content: center;" :class="{'optionSelected':selectedPatterns['3']}" @click="selectPattern('3')">3指型</div>
+                    <div style="width: 1px;height: 30px;background-color: #aaa;"></div>
+                    <div style="width: 60px;height: 30px;display: flex;align-items: center;justify-content: center;" :class="{'optionSelected':selectedPatterns['5']}" @click="selectPattern('5')">5指型</div>
+                    <div style="width: 1px;height: 30px;background-color: #aaa;"></div>
+                    <div style="width: 60px;height: 30px;display: flex;align-items: center;justify-content: center;" :class="{'optionSelected':selectedPatterns['6']}" @click="selectPattern('6')">6指型</div>
+                    <div style="width: 1px;height: 30px;background-color: #aaa;"></div>
+                    <div style="width: 60px;height: 30px;display: flex;align-items: center;justify-content: center;" :class="{'optionSelected':selectedPatterns['7']}" @click="selectPattern('7')">7指型</div>
+                    <div style="width: 1px;height: 30px;background-color: #aaa;"></div>
+                    <div style="width: 60px;height: 30px;display: flex;align-items: center;justify-content: center;" :class="{'optionSelected':selectedPatterns['2']}" @click="selectPattern('2')">2指型</div>
+                </div>
+            </td>
+            <td>
+                <div style="margin-left: 10px;display: inline-flex;flex-direction: row;border: 1px solid #aaa;border-radius: 4px;overflow: hidden;user-select: none;">
+                    <div style="width: 80px;height: 30px;display: flex;align-items: center;justify-content: center;" :class="{'optionSelected':this.halfNoteVisible}" @click="switchHalfNoteVisible()">显示半音</div>
+                </div>
+                <div v-if="mode==0||mode==4||mode==5" style="margin-left: 4px;display: inline-flex;flex-direction: row;border: 1px solid #aaa;border-radius: 4px;overflow: hidden;user-select: none;">
+                    <div style="width: 80px;height: 30px;display: flex;align-items: center;justify-content: center;" :class="{'optionSelected':this.hintPattern}" @click="switchHintPattern()">提示把位</div>
+                </div>
+                <div v-if="mode==4||mode==5" style="margin-left: 4px;display: inline-flex;flex-direction: row;border: 1px solid #aaa;border-radius: 4px;overflow: hidden;user-select: none;">
+                    <div style="width: 80px;height: 30px;display: flex;align-items: center;justify-content: center;" :class="{'optionSelected':this.heatmapVisible}" @click="switchHeatmap()">热力背景</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <svg style="margin-top: 20px;user-select:none;" :width="getCellLeft(16)+20" :height="style.height+style.stringWidth+style.noteRadius*5">
+
+        <!-- 3 5 7 9 品的背景 -->
+        <rect :x="getCellLeft(3)" :y="top" :width="getCellWidth(3)" :height="cellHeight*5" :fill="style.highlightBackgroundColor"/>
+        <rect :x="getCellLeft(5)" :y="top" :width="getCellWidth(5)" :height="cellHeight*5" :fill="style.highlightBackgroundColor"/>
+        <rect :x="getCellLeft(7)" :y="top" :width="getCellWidth(7)" :height="cellHeight*5" :fill="style.highlightBackgroundColor"/>
+        <rect :x="getCellLeft(9)" :y="top" :width="getCellWidth(9)" :height="cellHeight*5" :fill="style.highlightBackgroundColor"/>
+        <rect :x="getCellLeft(12)" :y="top" :width="getCellWidth(12)" :height="cellHeight*5" :fill="style.highlightBackgroundColor"/>
+        <circle r="4" :cx="getCellCenterX(3)" :cy="top+(cellHeight*2.5)" :fill="style.dotColor"/>
+        <circle r="4" :cx="getCellCenterX(5)" :cy="top+(cellHeight*2.5)" :fill="style.dotColor"/>
+        <circle r="4" :cx="getCellCenterX(7)" :cy="top+(cellHeight*2.5)" :fill="style.dotColor"/>
+        <circle r="4" :cx="getCellCenterX(9)" :cy="top+(cellHeight*2.5)" :fill="style.dotColor"/>
+        <circle r="4" :cx="getCellCenterX(12)" :cy="top+(cellHeight*0.5)" :fill="style.dotColor"/>
+        <circle r="4" :cx="getCellCenterX(12)" :cy="top+(cellHeight*4.5)" :fill="style.dotColor"/>
+
+        <line v-for="str in strings" :x1="getCellLeft(1)" :y1="top+cellHeight*str.index" :x2="getCellLeft(15)" :y2="top+cellHeight*str.index" :stroke="str.active?style.activeStringColor:style.stringColor" :stroke-width="style.stringWidth"/>
+
+        <rect :x="getCellLeft(1)-6" :y="top" :width="6" :height="bottom-top" :stroke="style.edgeColor" :stroke-width="style.stringWidth" fill-opacity="0"/>
+
+        <line v-for="n in 14" :x1="getCellLeft(n+1)" :x2="getCellLeft(n+1)" :y1="top" :y2="bottom" :stroke="style.edgeColor" :stroke-width="style.stringWidth"/>
+
+         <g v-for="(row,r) in strings">
+             <g v-for="(cell,c) in row.notes">
+                 <g :transform="'translate('+(getCellLeft(c)+getCellWidth(c)*0.5)+','+(top+r*cellHeight)+')'">
+                     <circle :r="style.noteRadius" :cx="0" :cy="0" :fill="cell.backgroundColor" :stroke="cell.strokeColor" stroke-width="1"/>
+                     <text :y="2" :x="-12" v-if="isShift(mode==2?cell.noty:cell.note)||isLower(mode==2?cell.noty:cell.note)" font-size="16" :fill="cell.fontColor">{{isShift(cell.mode==1?cell.note:cell.noty)?"♯":"♭"}}</text>
+                     <text :y="1" :fill="cell.fontColor" style='dominant-baseline:middle;text-anchor:middle;pointer-events: none;'>{{mode==2?cell.noty[cell.noty.length-1]:cell.note[cell.note.length-1]}}</text>
+                     <rect @click="onNoteClicked(cell,$event)" :x="-getCellWidth(c)/2" :y="-cellHeight/2" :width="getCellWidth(c)" :height="cellHeight" fill="#00000000"/>
+                 </g>
+             </g>
+         </g>
+
+    </svg>
+
+    <div v-if="mode==5" style="margin-left: 120px;">
+        <button @click="onKeydown('1')" style="width: 40px;height: 40px;">1</button>
+        <button @click="onKeydown('2')" style="width: 40px;height: 40px;margin-left: 4px;">2</button>
+        <button @click="onKeydown('3')" style="width: 40px;height: 40px;margin-left: 4px;">3</button>
+        <button @click="onKeydown('4')" style="width: 40px;height: 40px;margin-left: 4px;">4</button>
+        <button @click="onKeydown('5')" style="width: 40px;height: 40px;margin-left: 4px;">5</button>
+        <button @click="onKeydown('6')" style="width: 40px;height: 40px;margin-left: 4px;">6</button>
+        <button @click="onKeydown('7')" style="width: 40px;height: 40px;margin-left: 4px;">7</button>
+    </div>
+
+
+
+
+    <audio id="err" src="media/err.mp3" volume="0.2"/>
+
+</div>
+
+
+
+<script>
+    const { createApp } = Vue
+
+    function getQuery(name) {
+        const url_string =  window.location.href
+        const url = new URL(url_string);
+        return url.searchParams.get(name);
+    }
+
+    /*
+     * type:
+     *    0 不显示
+     *    1 显示唱名
+     *    2 显示音名
+     *    3 显示背景
+     */
+    let defalutType = getQuery("type");
+    if(defalutType == null) {
+        defalutType = "1";
+    }
+
+    createApp({
+        data() {
+            return {
+                strings : [
+                    {
+                        offset:0,
+                        index:0,
+                        active: false,
+                        notes:[
+                            {note:"3",noty:"E",index:0,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"4",noty:"F",index:1,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#4",noty:"#F",index:2,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"5",noty:"G",index:3,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b6",noty:"bA",index:4,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"6",noty:"A",index:5,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b7",noty:"bB",index:6,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"7",noty:"B",index:7,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"1",noty:"C",index:8,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#1",noty:"#C",index:9,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"2",noty:"D",index:10,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b3",noty:"bE",index:11,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"3",noty:"E",index:12,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"4",noty:"F",index:13,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#4",noty:"#F",index:14,string:0,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"}
+                        ]
+                    },
+                    {
+                        offset:0,
+                        index:1,
+                        active: false,
+                        notes:[
+                            {note:"7",noty:"B",index:0,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"1",noty:"C",index:1,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#1",noty:"#C",index:2,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"2",noty:"D",index:3,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b3",noty:"bE",index:4,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"3",noty:"E",index:5,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"4",noty:"F",index:6,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#4",noty:"#F",index:7,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"5",noty:"G",index:8,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b6",noty:"bA",index:9,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"6",noty:"A",index:10,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b7",noty:"bB",index:11,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"7",noty:"B",index:12,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"1",noty:"C",index:13,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#1",noty:"#C",index:14,string:1,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"}
+                        ]
+                    },
+                    {
+                        offset:0,
+                        index:2,
+                        active: false,
+                        notes:[
+                            {note:"5",noty:"G",index:0,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b6",noty:"bA",index:1,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"6",noty:"A",index:2,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b7",noty:"bB",index:3,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"7",noty:"B",index:4,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"1",noty:"C",index:5,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#1",noty:"#C",index:6,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"2",noty:"D",index:7,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b3",noty:"bE",index:8,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"3",noty:"E",index:9,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"4",noty:"F",index:10,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#4",noty:"#F",index:11,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"5",noty:"G",index:12,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b6",noty:"bA",index:13,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"6",noty:"A",index:14,string:2,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"}
+                        ]
+                    },
+                    {
+                        offset:0,
+                        index:3,
+                        active: false,
+                        notes:[
+                            {note:"2",noty:"D",index:0,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b3",noty:"bE",index:1,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"3",noty:"E",index:2,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"4",noty:"F",index:3,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#4",noty:"#F",index:4,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"5",noty:"G",index:5,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b6",noty:"bA",index:6,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"6",noty:"A",index:7,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b7",noty:"bB",index:8,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"7",noty:"B",index:9,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"1",noty:"C",index:10,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#1",noty:"#C",index:11,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"2",noty:"D",index:12,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b3",noty:"bE",index:13,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"3",noty:"E",index:14,string:3,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"}
+                        ]
+                    },
+                    {
+                        offset:0,
+                        index:4,
+                        active: false,
+                        notes:[
+                            {note:"6",noty:"A",index:0,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b7",noty:"bB",index:1,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"7",noty:"B",index:2,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"1",noty:"C",index:3,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#1",noty:"#C",index:4,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"2",noty:"D",index:5,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b3",noty:"bE",index:6,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"3",noty:"E",index:7,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"4",noty:"F",index:8,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#4",noty:"#F",index:9,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"5",noty:"G",index:10,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b6",noty:"bA",index:11,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"6",noty:"A",index:12,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b7",noty:"bB",index:13,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"7",noty:"B",index:14,string:4,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"}
+                        ]
+                    },
+                    {
+                        offset:0,
+                        index:5,
+                        active: false,
+                        notes:[
+                            {note:"3",noty:"E",index:0,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"4",noty:"F",index:1,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#4",noty:"#F",index:2,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"5",noty:"G",index:3,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b6",noty:"bA",index:4,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"6",noty:"A",index:5,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b7",noty:"bB",index:6,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"7",noty:"B",index:7,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"1",noty:"C",index:8,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#1",noty:"#C",index:9,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"2",noty:"D",index:10,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"b3",noty:"bE",index:11,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"3",noty:"E",index:12,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"4",noty:"F",index:13,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"},
+                            {note:"#4",noty:"#F",index:14,string:5,fontColor:"#FFF",backgroundColor:"#000",strokeColor:"#000"}
+                        ]
+                    }
+                ],
+                mode : defalutType,
+                style : {
+                    rate: 1,
+                    maxCellWidth: 80,
+                    height : 180,
+                    stringWidth : 2,
+                    noteRadius : 14,
+                    chainVisible : false,
+                    noteActiveStyle : {
+                       fontColor: "#ffffff",
+                       backgroundColor: "#07E",
+                       strokeColor: "#474747"
+                    },
+                    noteInActiveStyle : {
+                       fontColor: "#000000",
+                       backgroundColor: "#ffffff",
+                       strokeColor: "#6a6a6a"
+                    },
+                    noteErrStyle : {
+                       fontColor: "#FFF",
+                       backgroundColor: "#cb0000",
+                       strokeColor: "#474747"
+                    },
+                    dotColor : "#888",
+                    edgeColor : "#8d8d8d",
+                    stringColor : "#383838",
+                    activeStringColor : "#FF0000",
+                    highlightBackgroundColor : "#f2f2f2"
+                },
+                patterns: {
+                   "3" : [
+                       ["3","4","5"],
+                       ["7","1","2"],
+                       ["5","6"],
+                       ["2","3","4"],
+                       ["6","7","1"],
+                       ["3","4","5"]
+                   ],
+                    "5" : [
+                        ["5","6"],
+                        ["2","3","4"],
+                        ["6","7","1"],
+                        ["3","4","5"],
+                        ["7","1","2"],
+                        ["5","6"]
+                    ],
+                    "6":[
+                        ["6","7","1"],
+                        ["3","4","5"],
+                        ["7","1","2"],
+                        ["5","6"],
+                        ["2","3","4"],
+                        ["6","7","1"]
+                    ],
+                    "7":[
+                        ["7","1","2"],
+                        ["5","6"],
+                        ["2","3","4"],
+                        ["6","7","1"],
+                        ["3","4","5"],
+                        ["7","1","2"]
+                    ],
+                    "2" : [
+                        ["2","3","4"],
+                        ["6","7","1"],
+                        ["3","4","5"],
+                        ["7","1","2"],
+                        ["5","6"],
+                        ["2","3","4"]
+                    ]
+                },
+                selectedPatterns: {
+                    "3" : false,
+                    "5" : false,
+                    "6" : false,
+                    "7" : false,
+                    "2" : false
+                },
+                heatmapVisible: false,
+                halfNoteVisible: true, // 是否显示半音
+                hintPattern: true, // 是否提示指型
+                hintPatternSelect: 0,
+                key: "C",
+                practiceData: {
+                    string: 0,// 当前听的哪根弦
+                    index: 0,  // 当前听的音的位置
+                    selectedIndex: -1, // 当前选的哪个音
+                    selectedString: -1, // 当前选的哪根弦
+                    inputedNote: null // 位置辨音模式下输入什么音符
+                }
+            }
+        },
+        computed:{
+            top() {
+                return this.style.stringWidth/2+this.style.noteRadius;
+            },
+            bottom() {
+                return this.top + this.style.height;
+            },
+            cellHeight() {
+                return (this.bottom - this.top)/5;
+            }
+        },
+        mounted() {
+            this.initKeyListerners();
+           this.reset();
+           this.changeMode(defalutType,true);
+           this.guitarPlayer = new GuitarPlayer();
+           window.app = this;
+        },
+        methods : {
+            getCellLeft(index) {
+                let left = 0;
+                for(let i = 0 ; i < index ; ++i) {
+                    left += this.getCellWidth(i);
+                }
+                return left;
+            },
+            getCellCenterX(index) {
+               return this.getCellLeft(index) + this.getCellWidth(index)*0.5;
+            },
+            getCellWidth(index) {
+                if(index == 0) {
+                    return 50;
+                }
+                let width = this.style.maxCellWidth;
+                for(let i = 0 ; i < index - 1 ; ++i) {
+                    width *= this.style.rate;
+                }
+                return width;
+            },
+            initKeyListerners() {
+                document.addEventListener("keydown",(e)=>{
+                    if(!/^[1-7]$/.test(e.key)) {
+                        return;
+                    }
+                    this.onKeydown(e.key);
+                });
+            },
+            onKeydown(key){
+                if(this.mode != 5) {
+                    return;
+                }
+                let pnote = this.findNoteByIndex(this.practiceData.string,this.practiceData.index);
+                pnote.count++;
+                if(pnote.note != key) {
+                    this.playErrorSound();
+                    pnote.error++;
+                    return;
+                }
+                this.practiceData.selectedString = pnote.string;
+                this.practiceData.selectedIndex = pnote.index;
+                this.render();
+                this.playSound(pnote.string,pnote.index);
+                setTimeout(()=>{
+                    this.generatePractice();
+                },500);
+            },
+            playSound(string,index) {
+                this.guitarPlayer.playNote(string,index);
+            },
+            reset() {
+                for(let r=0;r<this.strings.length;++r) {
+                    this.strings[r].active = false;
+                    let row = this.strings[r].notes;
+                    for(let c=0;c<row.length;++c) {
+                        let cell = row[c];
+                        cell.fontColor = "#0000";
+                        cell.strokeColor = "#0000";
+                        cell.backgroundColor = "#0000";
+                    }
+                }
+            },
+            switchHalfNoteVisible() {
+                this.halfNoteVisible = !this.halfNoteVisible;
+                this.render();
+            },
+            changeKey(key) {
+               this.key = key;
+               let notes = ["1","#1","2","b3","3","4","#4","5","b6","6","b7","7"];
+               let offset = 0;
+               let pk = key.substring(key.length-1);
+                if(pk=="D") {
+                    offset = -2;
+                } else if(pk=="E") {
+                    offset = -4;
+                } else if(pk=="F") {
+                    offset = -5;
+                } else if(pk=="G") {
+                    offset = -7;
+                } else if(pk=="A") {
+                    offset = -9;
+                } else if(pk=="B") {
+                    offset = -11;
+                }
+                if(key.startsWith("#")) {
+                    offset--;
+                } else if(key.startsWith("b")) {
+                    offset++;
+                }
+
+                for(let s = 0 ; s < this.strings.length; ++s) {
+                    let str = this.strings[s];
+                    let fromIndex = 0;
+                    if(s == 0) {
+                        fromIndex = 4+offset;
+                    } else if(s==1) {
+                        fromIndex = 11+offset;
+                    } else if(s==2) {
+                        fromIndex = 7+offset;
+                    } else if(s==3) {
+                        fromIndex = 2+offset;
+                    } else if(s==4) {
+                        fromIndex = 9+offset;
+                    } else if(s==5) {
+                        fromIndex = 4+offset;
+                    }
+                    for(let n=0;n<str.notes.length;++n) {
+                        let index = (fromIndex+n) % notes.length;
+                        if(index < 0) {
+                            index += notes.length;
+                        }
+                        let note = str.notes[n];
+                        note.note = notes[index];
+                    }
+                }
+                this.render();
+            },
+            isShift(note) {
+               if(note.startsWith("#")) {
+                   return true;
+               }
+               return false;
+            },
+            isLower(note) {
+               if(note.startsWith("b")) {
+                   return true;
+               }
+               return false;
+            },
+            tun(o0,o1,o2,o3,o4,o5) {
+                this.strings[0].offset = o0;
+                this.strings[1].offset = o1;
+                this.strings[2].offset = o2;
+                this.strings[3].offset = o3;
+                this.strings[4].offset = o4;
+                this.strings[5].offset = o5;
+            },
+            changeChainVisible() {
+                this.style.chainVisible = !this.style.chainVisible;
+            },
+            switchHintPattern() {
+                this.hintPattern = !this.hintPattern;
+                this.render();
+            },
+            switchHeatmap() {
+                this.heatmapVisible = !this.heatmapVisible;
+                this.render();
+            },
+            render() {
+                this.reset();
+                if(this.mode == 0) {
+                    if(this.practiceData.selectedString >=0 && this.practiceData.selectedIndex >= 0) {
+                        let selectedNote = this.strings[this.practiceData.selectedString].notes[this.practiceData.selectedIndex];
+                        if(this.hintPattern) {
+                            let patterns = this.findPatternByNote(selectedNote);
+                            let showPattern = patterns[this.hintPatternSelect];
+                            for(let s = 0 ; s < 6; ++s) {
+                                for(let n = 0; n < showPattern[s].length; ++n) {
+                                    let noteName = showPattern[s][n];
+                                    let note = this.findNote(s,noteName);
+                                    note.fontColor = "#0000";
+                                    note.backgroundColor = this.style.noteInActiveStyle.backgroundColor;
+                                    note.strokeColor = this.style.noteInActiveStyle.strokeColor;
+                                }
+                            }
+                        }
+                        selectedNote.fontColor = this.style.noteActiveStyle.fontColor;
+                        selectedNote.strokeColor = this.style.noteActiveStyle.strokeColor;
+                        selectedNote.backgroundColor = this.style.noteActiveStyle.backgroundColor;
+                    }
+                    return;
+                }
+                if(this.mode == 1) {
+                    this.travelNotes((note)=>{
+                       let noteInSelectedPatterns = this.containsNoteInSelectedPatterns(note);
+                       if(noteInSelectedPatterns) {
+                           note.fontColor = this.style.noteActiveStyle.fontColor;
+                           note.backgroundColor = this.style.noteActiveStyle.backgroundColor;
+                           note.strokeColor = this.style.noteActiveStyle.strokeColor;
+                       } else {
+                           if(note.note.length > 1 && !this.halfNoteVisible) {
+                               note.fontColor = "#0000";
+                               note.backgroundColor = "#0000";
+                               note.strokeColor = "#0000";
+                           } else {
+                               note.fontColor = this.style.noteInActiveStyle.fontColor;
+                               note.backgroundColor = this.style.noteInActiveStyle.backgroundColor;
+                               note.strokeColor = this.style.noteInActiveStyle.strokeColor;
+                           }
+                       }
+                    });
+                    return;
+                }
+                if(this.mode == 2) {
+                    this.travelNotes((note)=>{
+                        let noteInSelectedPatterns = this.containsNoteInSelectedPatterns(note);
+                        if(noteInSelectedPatterns) {
+                            note.fontColor = this.style.noteActiveStyle.fontColor;
+                            note.backgroundColor = this.style.noteActiveStyle.backgroundColor;
+                            note.strokeColor = this.style.noteActiveStyle.strokeColor;
+                        } else {
+                            if(note.note.length > 1 && !this.halfNoteVisible) {
+                                note.fontColor = "#0000";
+                                note.backgroundColor = "#0000";
+                                note.strokeColor = "#0000";
+                            } else {
+                                note.fontColor = this.style.noteInActiveStyle.fontColor;
+                                note.backgroundColor = this.style.noteInActiveStyle.backgroundColor;
+                                note.strokeColor = this.style.noteInActiveStyle.strokeColor;
+                            }
+                        }
+                    });
+                    return;
+                }
+                if(this.mode == 3) {
+                    this.travelNotes((note)=>{
+                        note.fontColor = "#0000";
+                        let noteInSelectedPatterns = this.containsNoteInSelectedPatterns(note);
+                        if(noteInSelectedPatterns) {
+                            note.backgroundColor = this.style.noteActiveStyle.backgroundColor;
+                            note.strokeColor = this.style.noteActiveStyle.strokeColor;
+                        } else {
+                            if(note.note.length > 1 && !this.halfNoteVisible) {
+                                note.backgroundColor = "#0000";
+                                note.strokeColor = "#0000";
+                            } else {
+                                note.backgroundColor = this.style.noteInActiveStyle.backgroundColor;
+                                note.strokeColor = this.style.noteInActiveStyle.strokeColor;
+                            }
+                        }
+                        // if(this.practiceData.selectedString == note.string && this.practiceData.selectedIndex == note.index) {
+                        //     note.fontColor = noteInSelectedPatterns ? this.style.noteActiveStyle.fontColor : this.style.noteInActiveStyle.fontColor;
+                        // }
+                    });
+
+                    return;
+                }
+
+                if(this.mode == 4) {
+                    if(this.hintPattern) {
+                        this.travelNotes((note)=>{
+                            note.fontColor = "#0000";
+                            let noteInSelectedPatterns = this.containsNoteInSelectedPatterns(note);
+                            if(noteInSelectedPatterns) {
+                                note.backgroundColor = this.style.noteInActiveStyle.backgroundColor;
+                                note.strokeColor = this.style.noteInActiveStyle.strokeColor;
+                            } else {
+                                note.backgroundColor = "#0000";
+                                note.strokeColor = "#0000";
+                            }
+                        });
+                    }
+
+                    this.strings[this.practiceData.string].active = true;
+                    if(this.practiceData.selectedString>=0 && this.practiceData.selectedIndex>=0) {
+                        let isCorrect = this.practiceData.string == this.practiceData.selectedString && this.practiceData.index == this.practiceData.selectedIndex;
+                        let note = this.strings[this.practiceData.selectedString].notes[this.practiceData.selectedIndex];
+                        if(isCorrect) {
+                            note.strokeColor = this.style.noteActiveStyle.strokeColor;
+                            note.fontColor = this.style.noteActiveStyle.fontColor;
+                            note.backgroundColor = this.style.noteActiveStyle.backgroundColor;
+                        } else {
+                            note.strokeColor = this.style.noteErrStyle.strokeColor;
+                            note.fontColor = this.style.noteErrStyle.fontColor;
+                            note.backgroundColor = this.style.noteErrStyle.backgroundColor;
+                        }
+                    }
+
+                    if(this.heatmapVisible) {
+                        this.renderHeatmap();
+                    }
+                    return;
+                }
+
+                if(this.mode == 5) {
+
+                    if(this.hintPattern) {
+                        this.travelNotes((note)=>{
+                            note.fontColor = "#0000";
+                            let noteInSelectedPatterns = this.containsNoteInSelectedPatterns(note);
+                            if(noteInSelectedPatterns) {
+                                note.backgroundColor = this.style.noteInActiveStyle.backgroundColor;
+                                note.strokeColor = this.style.noteInActiveStyle.strokeColor;
+                            } else {
+                               note.backgroundColor = "#0000";
+                               note.strokeColor = "#0000";
+                            }
+                        });
+                    }
+
+                    let isCorrect = this.practiceData.string == this.practiceData.selectedString && this.practiceData.index == this.practiceData.selectedIndex;
+                    let note = this.strings[this.practiceData.string].notes[this.practiceData.index];
+                    if(isCorrect) {
+                        note.strokeColor = this.style.noteActiveStyle.strokeColor;
+                        note.fontColor = this.style.noteActiveStyle.fontColor;
+                        note.backgroundColor = this.style.noteActiveStyle.backgroundColor;
+                    } else if(this.practiceData.selectedIndex >= 0){
+                        note.strokeColor = this.style.noteErrStyle.strokeColor;
+                        note.fontColor = this.style.noteErrStyle.fontColor;
+                        note.backgroundColor = this.style.noteErrStyle.backgroundColor;
+                    } else {
+                        note.strokeColor = this.style.noteActiveStyle.strokeColor;
+                        note.backgroundColor = this.style.noteActiveStyle.backgroundColor;
+                        note.fontColor = "#0000";
+                    }
+
+                    if(this.heatmapVisible) {
+                        this.renderHeatmap();
+                    }
+                }
+            },
+            toHex(num) {
+               let hex = num.toString(16);
+               if(hex.length==1) {
+                   return "0" + hex;
+               }
+               return hex;
+            },
+            renderHeatmap() {
+                let maxErrorRate = 0;
+                for(let s = 0 ; s < this.strings.length; ++s) {
+                    for (let n = 0; n < this.strings[s].notes.length; ++n) {
+                        let note = this.strings[s].notes[n];
+                        let errorRate = note.count == 0 ? 0 : note.error / note.count;
+                        if(errorRate > maxErrorRate) {
+                            maxErrorRate = errorRate;
+                        }
+                    }
+                }
+                for(let s = 0 ; s < this.strings.length; ++s) {
+                    for(let n = 0 ; n < this.strings[s].notes.length; ++n) {
+                        let note = this.strings[s].notes[n];
+                        let errorRate = note.count == 0 ? 0 : note.error / note.count;
+                        if(maxErrorRate > 0) {
+                            errorRate = errorRate / maxErrorRate;
+                        }
+                        let gb = this.toHex(Math.floor(255 * (1-errorRate)));
+                        let backgroundColor = "#FF"+gb+gb;
+                        note.backgroundColor = backgroundColor;
+                        note.strokeColor = this.style.noteInActiveStyle.strokeColor;
+                    }
+                }
+            },
+            travelNotes(callback) {
+               for(let s = 0 ; s < 6 ; ++s) {
+                   let str = this.strings[s];
+                   for(let i = 0 ; i < str.notes.length; ++i) {
+                       let note = str.notes[i];
+                       callback(note);
+                   }
+               }
+            },
+            resetNoteCounter() {
+                for(let s = 0 ; s < this.strings.length ; ++s) {
+                    for(let n = 0 ; n < this.strings[s].notes.length; ++n) {
+                        let note = this.strings[s].notes[n];
+                        note.count = 0;
+                        note.error = 0;
+                    }
+                }
+            },
+            changeMode(type,force) {
+                if(this.mode == 4) {
+                    let baseNote = this.find1Note(4);
+                    this.playSound(4,baseNote.index);
+                    this.practiceData.string = baseNote.string;
+                    this.practiceData.index = baseNote.index;
+                    this.practiceData.selectedString = baseNote.string;
+                    this.practiceData.selectedIndex = baseNote.index;
+                    this.resetNoteCounter();
+                    this.render();
+                    setTimeout(()=>{
+                        this.generatePractice();
+                    },1000);
+                    return;
+                }
+
+                if(this.mode == 5) {
+                    this.resetNoteCounter();
+                    this.generatePractice();
+                    return;
+                }
+
+                this.render();
+            },
+            find1Note(str) {
+               for(let i = 0 ; i < this.strings[str].notes.length; ++i) {
+                   if(this.strings[str].notes[i].note=="1") {
+                       return this.strings[str].notes[i];
+                   }
+               }
+               return null;
+            },
+            findNote(string,note) {
+                for(let i = 0 ; i < this.strings[string].notes.length; ++i) {
+                    if(this.strings[string].notes[i].note==note) {
+                        return this.strings[string].notes[i];
+                    }
+                }
+                return null;
+            },
+            findNoteByIndex(string,index) {
+                return this.strings[string].notes[index];
+            },
+            randomInt(from,to) {
+               return from + Math.floor((to-from)*Math.random());
+            },
+            getSelectedPatternNames() {
+               let arr = [];
+               let patternNames = Object.keys(this.selectedPatterns);
+               for(let i = 0 ; i < patternNames.length; ++i) {
+                   if(this.selectedPatterns[patternNames[i]]) {
+                       arr.push(patternNames[i]);
+                   }
+               }
+               return arr;
+            },
+            generatePractice() {
+                if(parseInt(this.mode) < 4) {
+                    return;
+                }
+                let strIndex = 4;
+                let note = "1";
+                let selectedPatternNames = this.getSelectedPatternNames();
+                if(selectedPatternNames.length == 0) {
+                    // 未选择指型，从全指板找音
+                    strIndex = this.randomInt(0, 6);
+                    note = this.randomInt(1, 8) + "";
+                    while (strIndex == this.practiceData.string) {
+                        strIndex = this.randomInt(0, 6);
+                    }
+                } else {
+                    // 从当前选定的指型
+                    let options = new Map();
+                    for(let pn = 0; pn < selectedPatternNames.length; ++pn) {
+                        let patternName = selectedPatternNames[pn];
+                        let pattern = this.patterns[patternName];
+                        for(let i = 0 ; i < pattern.length; ++i) {
+                            for(let n = 0 ; n < pattern[i].length; ++n) {
+                                let note = {
+                                    string : i,
+                                    note : pattern[i][n]
+                                }
+                                let key = ""+note.string+"_"+note.note;
+                                if(options.has(key)) {
+                                    continue;
+                                }
+                                options.set(key,note);
+                            }
+                        }
+                    }
+                    options = [...options.values()];
+                    let selectedOption = options[this.randomInt(0,options.length)];
+                    while (selectedOption.string == this.practiceData.string) {
+                        selectedOption = options[this.randomInt(0,options.length)];
+                    }
+                    strIndex = selectedOption.string;
+                    note = selectedOption.note;
+                }
+
+                this.practiceData.string = strIndex;
+                let str = this.strings[this.practiceData.string];
+                for (let i = 0; i < 12; ++i) {
+                    if (str.notes[i].note == note) {
+                        this.practiceData.index = i;
+                        break;
+                    }
+                }
+                if(this.mode == 4) {
+                    this.playSound(this.practiceData.string, this.practiceData.index);
+                }
+                this.practiceData.selectedIndex = -1;
+                this.practiceData.selectedString = -1;
+                this.render();
+            },
+            containsNoteInSelectedPatterns(note) {
+                for(let patternName in this.selectedPatterns) {
+                    if(this.selectedPatterns[patternName]) {
+                        if(this.containsNoteInPattern(patternName,note)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            },
+            containsNoteInPattern(name,note) {
+               let pattern = this.patterns[name];
+               if(pattern == null) {
+                   return false;
+               }
+               return pattern[note.string].indexOf(note.note) >= 0;
+            },
+            findPatternByNote(note) {
+                let patterns = [];
+                if(this.containsNoteInPattern("3",note)) {
+                    patterns.push(this.patterns["3"]);
+                }
+                if(this.containsNoteInPattern("6",note)) {
+                    patterns.push(this.patterns["6"]);
+                }
+                if(this.containsNoteInPattern("2",note)) {
+                    patterns.push(this.patterns["2"]);
+                }
+                if(this.containsNoteInPattern("5",note)) {
+                    patterns.push(this.patterns["5"]);
+                }
+                if(this.containsNoteInPattern("7",note)) {
+                    patterns.push(this.patterns["7"]);
+                }
+                return patterns;
+            },
+            onNoteClicked(note,event) {
+                // 当模式为显示音名或者显示唱名时，仅播放声音
+                if(this.mode == 1 || this.mode == 2 || this.mode == 3) {
+                    this.playSound(note.string,note.index);
+                    return;
+                }
+
+                if(this.mode == 4) {
+                    this.practiceData.selectedString = note.string;
+                    this.practiceData.selectedIndex = note.index;
+                    this.render();
+                    let pnote = this.findNoteByIndex(this.practiceData.string,this.practiceData.index);
+                    pnote.count++;
+                    let correct = this.practiceData.string == this.practiceData.selectedString && this.practiceData.index == this.practiceData.selectedIndex;
+                    if(correct) {
+                        setTimeout(()=>{
+                            this.generatePractice();
+                        },500);
+                    } else {
+                        pnote.error++;
+                        this.playErrorSound();
+                    }
+                }
+
+                if(this.mode == 0) {
+                    this.playSound(note.string,note.index);
+                    let sameNoteClick = this.practiceData.selectedString == note.string && this.practiceData.selectedIndex == note.index;
+
+                    let patterns = this.findPatternByNote(note);
+                    if(sameNoteClick) {
+                        this.hintPatternSelect++;
+                        if(this.hintPatternSelect >= patterns.length) {
+                            this.hintPatternSelect = 0;
+                        }
+                    } else {
+                        this.practiceData.selectedString = note.string;
+                        this.practiceData.selectedIndex = note.index;
+                    }
+                    this.render();
+                    return;
+                }
+                //
+                // if(this.mode == 4) {
+                //     let correct = this.practiceData.string == note.string && this.strings[this.practiceData.string].notes[this.practiceData.index].note == note.note;
+                //     if(correct) {
+                //         note.backgroundColor = "#0b900b";
+                //     } else {
+                //         note.backgroundColor = "#b40404";
+                //     }
+                //     this.hideNotesExcept(note,1,0);
+                //     if(correct) {
+                //         setTimeout(()=>{
+                //             note.mode = 0;
+                //             this.generatePractice();
+                //         },500);
+                //     } else {
+                //         this.playErrorSound();
+                //     }
+                // }
+
+            },
+            playErrorSound() {
+                document.getElementById("err").play();
+            },
+            selectPattern(pattern) {
+                this.selectedPatterns[pattern] = !this.selectedPatterns[pattern];
+                this.render();
+            },
+            hideNotesExcept(note,mode,inmode,exceptMode) {
+                for(let r = 0 ; r < this.strings.length; ++r) {
+                    let row = this.strings[r].notes;
+                    for(let c = 0 ; c < row.length; ++c) {
+                        let cell = row[c];
+                        if(cell.mode == exceptMode) {
+                            continue;
+                        }
+                        if(cell == note) {
+                            cell.mode = mode;
+                        } else {
+                            cell.mode = inmode;
+                        }
+                    }
+                }
+            }
+        }
+    }).mount('#app')
+</script>
+</body>
+</html>
