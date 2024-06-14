@@ -53,13 +53,7 @@ import {Options, Vue} from 'vue-class-component';
 import GuitarPlayer from '../GuitarPlayer/GuitarPlayer';
 import NoteEvent from './NoteEvent';
 import Tone from './Tone';
-
-
-
-enum NoteStyle {
-  number_name, // 唱名
-  note_name    // 音名
-}
+import NoteStyle from './NoteStyle';
 
 class Note {
   // 是否显示
@@ -105,6 +99,14 @@ export default class GuitarBoardView extends Vue {
   private onNoteClicked(str:number,index:number) {
     this.guitarPlayer.playNote(str,index);
     this.$emit("note-click",new NoteEvent(str,index));
+  }
+
+  public setNoteStyle(noteStyle:NoteStyle) {
+    this.noteStyle = noteStyle;
+  }
+
+  public getNoteStyle() {
+    return this.noteStyle;
   }
 
   public setTone(tone:Tone) {

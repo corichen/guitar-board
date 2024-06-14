@@ -10,6 +10,7 @@ import GuitarPlayer from './GuitarPlayer/GuitarPlayer';
 import GuitarBoardView from './GuitarBoardView/GuitarBoardView.vue';
 import NoteEvent from './GuitarBoardView/NoteEvent';
 import Tone from './GuitarBoardView/Tone';
+import NoteStyle from './GuitarBoardView/NoteStyle';
   
 
   @Options({
@@ -21,7 +22,8 @@ import Tone from './GuitarBoardView/Tone';
     guitarPlayer : GuitarPlayer = new GuitarPlayer();
 
     onNoteClick(e:NoteEvent){
-      this.guitarBoardView.setVisible(false);
+      this.guitarBoardView.setNoteStyle(NoteStyle.note_name);
+
     }
 
     get guitarBoardView() : GuitarBoardView {
