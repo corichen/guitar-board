@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="user-select: none;">
     <svg :width="width+marginLeft*2" :height="height+marginTop*2" style="border: #888 dashed 1px;">
       <g :transform="'translate('+marginLeft+','+marginTop+')'">
         <!-- guitar board background -->
@@ -29,11 +29,13 @@
         <g>
           <template v-for="(strObj,str) in this.strings">
             <template v-for="(note,index) in strObj">
-              <g :transform="'translate('+getNoteCenterX(str,index)+','+getNoteCenterY(str,index)+')'">
+              <g v-show="note.visible" @click="onNoteClicked(str,index)" :transform="'translate('+getNoteCenterX(str,index)+','+getNoteCenterY(str,index)+')'">
                 <circle cx="0" cy="0" :r="noteWidth/2" :fill="note.focus?'#07E':'#FFFFFF'" stroke="#888"></circle>
-                <text y="1" :fill="note.focus?'#FFF':'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">{{ getNoteSimpleName(str,index) }}</text> 
-                <text v-show="isNoteUpper(str,index)" y="2" x="-12" font-size="16" :fill="note.focus?'#FFF':'#000'">♯</text>
-                <text v-show="isNoteLower(str,index)" y="2" x="-12" font-size="16" :fill="note.focus?'#FFF':'#000'">♭</text>
+                <g v-show="note.nameVisible">
+                  <text y="1" :fill="note.focus?'#FFF':'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">{{ getNoteSimpleName(str,index) }}</text> 
+                  <text v-show="isNoteUpper(str,index)" y="-2" x="-8" font-size="16" :fill="note.focus?'#FFF':'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">♯</text>
+                  <text v-show="isNoteLower(str,index)" y="-2" x="-8" font-size="16" :fill="note.focus?'#FFF':'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">♭</text>
+                </g>
               </g>
             </template>
           </template>
@@ -49,22 +51,10 @@
 <script lang="ts">
 import {Options, Vue} from 'vue-class-component';
 import GuitarPlayer from '../GuitarPlayer/GuitarPlayer';
+import NoteEvent from './NoteEvent';
+import Tone from './Tone';
 
 
-enum Tone {
-  C,
-  sC,
-  D,
-  bE,
-  E,
-  F,
-  sF,
-  G,
-  bA,
-  A,
-  bB,
-  B
-}
 
 enum NoteStyle {
   number_name, // 唱名
@@ -81,52 +71,113 @@ class Note {
 }
 
 
-
-
 @Options({
   components: {
   },
   props: {
-  }
+  },
+  emits: [
+    "note-click"
+  ]
 })
 export default class GuitarBoardView extends Vue {
-
-
   private guitarPlayer : GuitarPlayer = new GuitarPlayer();
 
   private strings : [Note[]] = [[]];
 
-  noteStyle: NoteStyle = NoteStyle.number_name;
+  private noteStyle: NoteStyle = NoteStyle.number_name;
 
-  tone : Tone = Tone.C;
+  private tone : Tone = Tone.C;
 
-  cellWidth : number = 76;
-  cellHeight : number = 40;
-  noteWidth : number = 28;
-  marginLeft : number = 40;
-  marginTop : number = 20;
-  fretColor : string = "#888";
-  fretHintBackgroundColor : string = "#00000011";
-  fretHintPointColor : string = "#666";
-  stringColor : string = "#000000";
+  private cellWidth : number = 76;
+  private cellHeight : number = 40;
+  private noteWidth : number = 28;
+  private marginLeft : number = 40;
+  private marginTop : number = 20;
+  private fretColor : string = "#888";
+  private fretHintBackgroundColor : string = "#00000011";
+  private fretHintPointColor : string = "#666";
+  private stringColor : string = "#000000";
 
-  static noteNames = ["C","sC","D","bE","E","F","sF","G","bA","A","bB","B"];
-  static numberNames = ["1","s1","2","b3","3","4","s4","5","b6","6","b7","7"];
+  private static noteNames = ["C","sC","D","bE","E","F","sF","G","bA","A","bB","B"];
+  private static numberNames = ["1","s1","2","b3","3","4","s4","5","b6","6","b7","7"];
 
-  getNoteSimpleName(str:number,index:number) : string {
+  private onNoteClicked(str:number,index:number) {
+    this.guitarPlayer.playNote(str,index);
+    this.$emit("note-click",new NoteEvent(str,index));
+  }
+
+  public setTone(tone:Tone) {
+    this.tone = tone;
+  }
+
+  public getTone() {
+    return this.tone;
+  }
+
+  public setFocus(focus:boolean=true,str:number|null=null,index:number|null=null) {
+    if(str == null) {
+      for(let i = 0 ; i < this.strings.length ; ++i) {
+        this.setFocus(focus,i,index);
+      }
+      return;
+    } else if(index == null) {
+      for(let i = 0; i < this.strings[str].length; ++i) {
+        this.setFocus(focus,str,i);
+      }
+      return;
+    }
+    this.strings[str][index].focus = focus;
+  }
+
+  public setVisible(visible:boolean=true,str:number|null=null,index:number|null=null) {
+    if(str == null) {
+      for(let i = 0 ; i < this.strings.length ; ++i) {
+        this.setVisible(visible,i,index);
+      }
+      return;
+    } else if(index == null) {
+      for(let i = 0; i < this.strings[str].length; ++i) {
+        this.setVisible(visible,str,i);
+      }
+      return;
+    }
+    this.strings[str][index].visible = visible;
+  }
+
+  public setNameVisible(visible:boolean=true,str:number|null=null,index:number|null=null) {
+    if(str == null) {
+      for(let i = 0 ; i < this.strings.length ; ++i) {
+        this.setNameVisible(visible,i,index);
+      }
+      return;
+    } else if(index == null) {
+      for(let i = 0; i < this.strings[str].length; ++i) {
+        this.setNameVisible(visible,str,i);
+      }
+      return;
+    }
+    this.strings[str][index].nameVisible = visible;
+  }
+
+  public clearFocus() {
+    this.setFocus(false);
+  }
+
+  private getNoteSimpleName(str:number,index:number) : string {
     let name = this.getNoteName(str,index);
     return name.substring(name.length-1);
   }
 
-  isNoteUpper(str:number,index:number) {
+  private isNoteUpper(str:number,index:number) {
     return this.getNoteName(str,index).startsWith("s");
   }
 
-  isNoteLower(str:number,index:number) {
+  private isNoteLower(str:number,index:number) {
     return this.getNoteName(str,index).startsWith("b");
   }
 
-  getNoteName(str:number,index:number) : string {
+  private getNoteName(str:number,index:number) : string {
     if(this.noteStyle == NoteStyle.note_name) {
       if(str == 1) {
         return GuitarBoardView.noteNames[(index+11)%12];
@@ -158,22 +209,22 @@ export default class GuitarBoardView extends Vue {
     return "5";
   }
 
-  getNoteCenterX(str:number,index:number) : number {
+  private getNoteCenterX(str:number,index:number) : number {
     if(index == 0) {
       return -this.marginLeft / 2;
     }
     return this.cellWidth * (index-0.5);
   }
 
-  getNoteCenterY(str:number,index:number) : number {
+  private getNoteCenterY(str:number,index:number) : number {
     return str * this.cellHeight;
   }
 
-  get width() {
+  private get width() {
     return this.cellWidth * 14;
   }
 
-  get height() {
+  private get height() {
     return this.cellHeight * 5;
   }
 

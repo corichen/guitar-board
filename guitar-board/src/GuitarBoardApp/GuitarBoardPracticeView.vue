@@ -1,14 +1,17 @@
 <template>
     <div>
-      <GuitarBoardView></GuitarBoardView>
+      <GuitarBoardView ref="guitarBoardView" @note-click="onNoteClick"></GuitarBoardView>
     </div>
 </template>
   
   <script lang="ts">
   import {Options, Vue} from 'vue-class-component';
 import GuitarPlayer from './GuitarPlayer/GuitarPlayer';
-import GuitarBoardView from './components/GuitarBoardView.vue';
+import GuitarBoardView from './GuitarBoardView/GuitarBoardView.vue';
+import NoteEvent from './GuitarBoardView/NoteEvent';
+import Tone from './GuitarBoardView/Tone';
   
+
   @Options({
     components: {
       GuitarBoardView
@@ -17,10 +20,16 @@ import GuitarBoardView from './components/GuitarBoardView.vue';
   export default class GuitarBoardPracticeView extends Vue {
     guitarPlayer : GuitarPlayer = new GuitarPlayer();
 
+    onNoteClick(e:NoteEvent){
+      this.guitarBoardView.setVisible(false);
+    }
+
+    get guitarBoardView() : GuitarBoardView {
+      return (this.$refs.guitarBoardView as GuitarBoardView);
+    }
+
     mounted() {
-      this.guitarPlayer.playNote(0,0);
-      this.guitarPlayer.playNote(1,0);
-      this.guitarPlayer.playNote(2,0);
+      
     }
   }
   
