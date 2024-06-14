@@ -1,8 +1,8 @@
 export default class GuitarPlayer {
 
-    noteIndex : any = null;
-    audioContext : any = null;
-    audioData : any = null;
+    private noteIndex : any = null;
+    private audioContext : any = null;
+    private audioData : any = null;
 
     constructor() {
         this.noteIndex = [
@@ -137,7 +137,7 @@ export default class GuitarPlayer {
 
         bufferSource.start(0);
     }
-    async playNote(string:number,index:number) {
+    public async playNote(string:number,index:number) {
         if(this.audioData == null) {
             await this.init();
         }
