@@ -51,11 +51,8 @@ import Location from '../GuitarPlayer/Location';
 
     private slideChords : boolean = true;
 
-    private loadChords() {
-
-      let matchReg = new RegExp(this.keyword);
-
-      this.chords = [];
+    private searchChords(namePattern:RegExp) {
+      let chords : Chord[] = [];
       const names = ['C',"#C","D","bE","E","F","#F","G","bA","A","bB","B"];
       for(let i = 0 ; i < chordsJason.length; ++i) {
         let chordObj = chordsJason[i];
@@ -70,7 +67,7 @@ import Location from '../GuitarPlayer/Location';
           }
         }
         let nameFromIndex = names.indexOf(chordObj.name[0]);
-        for(let s = slideFrom ; s < slideCount; ++s){
+        for(let s = slideFrom ; s < slideCount + slideFrom; ++s){
           let chord = new Chord();
           chord.root = chordObj.root;
           chord.name = names[(nameFromIndex+s+names.length)%names.length]+chordObj.name.substring(1);
@@ -89,12 +86,17 @@ import Location from '../GuitarPlayer/Location';
             chord.notes.push(loc);
           }
 
-          if(matchReg.test(chord.name)){
-            this.chords.push(chord);
+          if(namePattern.test(chord.name)){
+            chords.push(chord);
           }
         }
-
       }
+      return chords;
+    }
+
+
+    private loadChords() {
+      this.chords = this.searchChords(new RegExp(this.keyword));
     }
 
 

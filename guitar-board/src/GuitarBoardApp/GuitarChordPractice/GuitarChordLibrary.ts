@@ -76,13 +76,15 @@ export default [
     },
     {
         name: "Cmaj7",
-        slide: 9,
+        slideFrom: -3,
+        slide: 12,
         root: 4,
         notes: "x3545"
     },
     {
         name: "Cm7",
-        slide: 9,
+        slideFrom: -3,
+        slide: 12,
         root: 4,
         notes: "x3534"
     },
