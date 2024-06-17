@@ -95,8 +95,8 @@ export default class GuitarBoardView extends Vue {
   private fretHintPointColor : string = "#666";
   private stringColor : string = "#000000";
 
-  private static noteNames = ["C","sC","D","bE","E","F","sF","G","bA","A","bB","B"];
-  private static numberNames = ["1","s1","2","b3","3","4","s4","5","b6","6","b7","7"];
+  private static noteNames = ["C","#C","D","bE","E","F","#F","G","bA","A","bB","B"];
+  private static numberNames = ["1","#1","2","b3","3","4","#4","5","b6","6","b7","7"];
 
   private onNoteClicked(str:number,index:number) {
     this.guitarPlayer.playNote(str,index);
@@ -177,7 +177,7 @@ export default class GuitarBoardView extends Vue {
   }
 
   private isNoteUpper(str:number,index:number) {
-    return this.getNoteName(str,index).startsWith("s");
+    return this.getNoteName(str,index).startsWith("#");
   }
 
   private isNoteLower(str:number,index:number) {
