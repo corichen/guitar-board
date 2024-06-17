@@ -24,6 +24,27 @@ export default [
         notes: "022000"
     },
     {
+        name: "Cmaj7",
+        slideFrom: -8,
+        slide: 12,
+        root: 5,
+        notes: "8a99"
+    },
+    {
+        name: "Cm7",
+        slideFrom: -8,
+        slide: 12,
+        root: 5,
+        notes: "8a88"
+    },
+    {
+        name: "C7",
+        slideFrom: -8,
+        slide: 12,
+        root: 5,
+        notes: "8a89"
+    },
+    {
         name: "C",
         slide: 11,
         root: 4,
