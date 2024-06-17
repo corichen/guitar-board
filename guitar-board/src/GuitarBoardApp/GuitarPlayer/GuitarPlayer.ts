@@ -1,4 +1,4 @@
-import ILocation from "./ILocation";
+import Location from "./Location";
 
 export default class GuitarPlayer {
 
@@ -146,7 +146,7 @@ export default class GuitarPlayer {
             },time);
         });
     }
-    public async playNotes(notes:ILocation[],delay:number=0){
+    public async playNotes(notes:Location[],delay:number=0){
         for(let i = 0 ; i < notes.length; ++i) {
             if(notes[i].str < 0 || notes[i].str > 5) {
                 continue;

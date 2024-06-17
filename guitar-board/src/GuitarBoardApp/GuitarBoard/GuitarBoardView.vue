@@ -54,7 +54,7 @@ import GuitarPlayer from '../GuitarPlayer/GuitarPlayer';
 import NoteEvent from './NoteEvent';
 import Tone from './Tone';
 import NoteStyle from './NoteStyle';
-import ILocation from '../GuitarPlayer/ILocation';
+import Location from '../GuitarPlayer/Location';
 
 
 class Note {
@@ -119,7 +119,7 @@ export default class GuitarBoardView extends Vue {
     return this.tone;
   }
 
-  public setFocus(focus:boolean=true,locations:ILocation[]|null=null) {
+  public setFocus(focus:boolean=true,locations:Location[]|null=null) {
     if(locations == null) {
       for(let i = 0 ; i < this.strings.length ; ++i) {
         for(let j = 0 ; j < this.strings[i].length; ++j) {
@@ -135,7 +135,7 @@ export default class GuitarBoardView extends Vue {
     }
   }
 
-  public setVisible(visible:boolean=true,locations:ILocation[]|null=null) {
+  public setVisible(visible:boolean=true,locations:Location[]|null=null) {
     if(locations == null) {
       for(let i = 0 ; i < this.strings.length ; ++i) {
         for(let j = 0 ; j < this.strings[i].length; ++j) {
@@ -151,7 +151,7 @@ export default class GuitarBoardView extends Vue {
     }
   }
 
-  public setNameVisible(visible:boolean=true,locations:ILocation[]|null=null) {
+  public setNameVisible(visible:boolean=true,locations:Location[]|null=null) {
     if(locations == null) {
       for(let i = 0 ; i < this.strings.length ; ++i) {
         for(let j = 0 ; j < this.strings[i].length; ++j) {

@@ -1,16 +1,16 @@
 <template>
   <div class="home">
-    <GuitarBoardPracticeView></GuitarBoardPracticeView>
+    <GuitarChordPracticeView></GuitarChordPracticeView>
   </div>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import GuitarBoardPracticeView from './GuitarBoardPracticeView.vue';
+import GuitarChordPracticeView from './GuitarChordPractice/GuitarChordPracticeView.vue';
 
 @Options({
   components: {
-    GuitarBoardPracticeView
+    GuitarChordPracticeView
   },
 })
 export default class HomeView extends Vue {
