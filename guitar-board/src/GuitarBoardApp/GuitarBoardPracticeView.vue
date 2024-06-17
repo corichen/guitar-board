@@ -6,11 +6,8 @@
   
   <script lang="ts">
   import {Options, Vue} from 'vue-class-component';
-import GuitarPlayer from './GuitarPlayer/GuitarPlayer';
 import GuitarBoardView from './GuitarBoardView/GuitarBoardView.vue';
 import NoteEvent from './GuitarBoardView/NoteEvent';
-import Tone from './GuitarBoardView/Tone';
-import NoteStyle from './GuitarBoardView/NoteStyle';
   
 
   @Options({
@@ -19,11 +16,9 @@ import NoteStyle from './GuitarBoardView/NoteStyle';
     }
   })
   export default class GuitarBoardPracticeView extends Vue {
-    guitarPlayer : GuitarPlayer = new GuitarPlayer();
-
     onNoteClick(e:NoteEvent){
-      this.guitarBoardView.setNoteStyle(NoteStyle.note_name);
-
+     // this.guitarBoardView.setNoteStyle(NoteStyle.note_name);
+      this.guitarBoardView.setFocus(true,[{str:0,index:0}]);
     }
 
     get guitarBoardView() : GuitarBoardView {

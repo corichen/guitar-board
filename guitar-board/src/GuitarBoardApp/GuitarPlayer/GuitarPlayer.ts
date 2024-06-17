@@ -1,3 +1,5 @@
+import ILocation from "./ILocation";
+
 export default class GuitarPlayer {
 
     private noteIndex : any = null;
@@ -11,85 +13,85 @@ export default class GuitarPlayer {
                 index: 0,
                 offset: -8,
                 begin:0,
-                duration:3.8
+                end:3.8
             },
             {
                 string: 4,
                 index: 0,
                 offset: -3,
-                begin:3.8,
-                duration: 3.9
+                begin:3.96,
+                end:7.7
             },
             {
                 string: 3,
                 index: 0,
                 offset: 2,
-                begin:7.7,
-                duration: 3.2
+                begin:7.79,
+                end:10.9
             },
             {
                 string: 2,
                 index: 0,
                 offset: 7,
-                begin:10.9,
-                duration: 3.1
+                begin:11,
+                end:14
             },
             {
                 string: 1,
                 index: 0,
                 offset: 11,
-                begin: 14,
-                duration: 2.8
+                begin: 14.04,
+                end: 16.8
             },
             {
                 string: 0,
                 index: 0,
                 offset: 16,
                 begin: 16.8,
-                duration: 2.6
+                end: 19.4
             },
             {
                 string: 5,
                 index: 7,
                 offset: -1,
                 begin: 19.4,
-                duration: 2.4
+                end:21.8
             },
             {
                 string: 4,
                 index: 7,
                 offset: 4,
-                begin: 21.8,
-                duration: 2.6
+                begin: 21.9,
+                end: 24.4
             }
             ,
             {
                 string: 3,
                 index: 7,
                 offset: 9,
-                begin: 24.4,
-                duration: 2.6
+                begin: 24.55,
+                end: 27
             },
             {
                 string: 2,
                 index: 7,
                 offset: 14,
-                begin: 27,
-                duration: 2.2
+                begin: 27.06,
+                end: 29.2
             },
             {
                 string: 1,
                 index: 7,
                 offset: 18,
-                begin: 29.2,
-                duration: 2.2
+                begin: 29.35,
+                end: 31.4
             },
             {
                 string: 0,
                 index: 7,
                 offset: 23,
-                begin: 31.4,
-                duration: 2.5
+                begin: 31.48,
+                end: 33.9
             }
 
         ];
@@ -137,6 +139,22 @@ export default class GuitarPlayer {
 
         bufferSource.start(0);
     }
+    private async wait(time:number) {
+        return new Promise((resolve)=>{
+            setTimeout(()=>{
+                resolve(1);
+            },time);
+        });
+    }
+    public async playNotes(notes:ILocation[],delay:number=0){
+        for(let i = 0 ; i < notes.length; ++i) {
+            if(notes[i].str < 0 || notes[i].str > 5) {
+                continue;
+            }
+            await this.playNote(notes[i].str,notes[i].index);
+            await this.wait(delay);
+        }
+    }
     public async playNote(string:number,index:number) {
         if(this.audioData == null) {
             await this.init();
@@ -177,6 +195,6 @@ export default class GuitarPlayer {
 
         gainNode.connect(this.audioContext.destination);
 
-        bufferSource.start(0,sampleNote.begin,sampleNote.duration);
+        bufferSource.start(0,sampleNote.begin,sampleNote.end-sampleNote.begin);
     }
 }

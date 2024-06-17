@@ -54,6 +54,8 @@ import GuitarPlayer from '../GuitarPlayer/GuitarPlayer';
 import NoteEvent from './NoteEvent';
 import Tone from './Tone';
 import NoteStyle from './NoteStyle';
+import ILocation from '../GuitarPlayer/ILocation';
+
 
 class Note {
   // 是否显示
@@ -117,49 +119,52 @@ export default class GuitarBoardView extends Vue {
     return this.tone;
   }
 
-  public setFocus(focus:boolean=true,str:number|null=null,index:number|null=null) {
-    if(str == null) {
+  public setFocus(focus:boolean=true,locations:ILocation[]|null=null) {
+    if(locations == null) {
       for(let i = 0 ; i < this.strings.length ; ++i) {
-        this.setFocus(focus,i,index);
+        for(let j = 0 ; j < this.strings[i].length; ++j) {
+          this.strings[i][j].focus = focus;
+        }
       }
       return;
-    } else if(index == null) {
-      for(let i = 0; i < this.strings[str].length; ++i) {
-        this.setFocus(focus,str,i);
+    } else {
+      for(let i = 0; i < locations.length; ++i) {
+        this.strings[locations[i].str][locations[i].index].focus = focus;
       }
       return;
     }
-    this.strings[str][index].focus = focus;
   }
 
-  public setVisible(visible:boolean=true,str:number|null=null,index:number|null=null) {
-    if(str == null) {
+  public setVisible(visible:boolean=true,locations:ILocation[]|null=null) {
+    if(locations == null) {
       for(let i = 0 ; i < this.strings.length ; ++i) {
-        this.setVisible(visible,i,index);
+        for(let j = 0 ; j < this.strings[i].length; ++j) {
+          this.strings[i][j].visible = visible;
+        }
       }
       return;
-    } else if(index == null) {
-      for(let i = 0; i < this.strings[str].length; ++i) {
-        this.setVisible(visible,str,i);
+    } else {
+      for(let i = 0; i < locations.length; ++i) {
+        this.strings[locations[i].str][locations[i].index].visible = visible;
       }
       return;
     }
-    this.strings[str][index].visible = visible;
   }
 
-  public setNameVisible(visible:boolean=true,str:number|null=null,index:number|null=null) {
-    if(str == null) {
+  public setNameVisible(visible:boolean=true,locations:ILocation[]|null=null) {
+    if(locations == null) {
       for(let i = 0 ; i < this.strings.length ; ++i) {
-        this.setNameVisible(visible,i,index);
+        for(let j = 0 ; j < this.strings[i].length; ++j) {
+          this.strings[i][j].nameVisible = visible;
+        }
       }
       return;
-    } else if(index == null) {
-      for(let i = 0; i < this.strings[str].length; ++i) {
-        this.setNameVisible(visible,str,i);
+    } else {
+      for(let i = 0; i < locations.length; ++i) {
+        this.strings[locations[i].str][locations[i].index].nameVisible = visible;
       }
       return;
     }
-    this.strings[str][index].nameVisible = visible;
   }
 
   public clearFocus() {
