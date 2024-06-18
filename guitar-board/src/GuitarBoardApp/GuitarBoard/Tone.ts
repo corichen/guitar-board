@@ -10,6 +10,7 @@ enum Tone {
     bA,
     A,
     bB,
-    B
+    B,
 }
+
 export default Tone;

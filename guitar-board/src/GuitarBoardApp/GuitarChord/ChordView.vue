@@ -8,7 +8,7 @@
           <line v-for="column in 6" :x1="cellWidth*(column-1)" :x2="cellWidth*(column-1)" y1="0" :y2="cellHeight*rowCount" stroke="#000"></line>
           <circle v-for="note in chordProp.notes" :cx="(5-note.str)*cellWidth" :cy="note.index==0?-7:(note.index-baseIndex+0.5)*cellHeight" :r="4" :fill="note.str==chordProp.root?'#aa0000':'#000'" ></circle>
         </g>
-        <text :x="width/2" :y="height-12" :fill="'#000'" font-weight="bold" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">{{ chordProp.name }}</text>
+        <text :x="width/2" :y="height-12" :fill="'#000'" font-weight="bold" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">{{ chordProp.tone != null ? chordProp.nameInTone : chordProp.name }}</text>
         <text v-if="baseIndex!=1" :x="marginLeft-5" :y="marginTop+cellHeight/2" :fill="'#000'" font-size="11" font-weight="bold" style="dominant-baseline: middle; text-anchor: end; pointer-events: none;">{{ baseIndex }}</text>
       </svg>
     </div>

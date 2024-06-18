@@ -1,6 +1,13 @@
 <template>
-  <div style="user-select: none;">
-    <svg :width="width+marginLeft*2" :height="height+marginTop*2" style="border: #888 dashed 1px;">
+  <div style="user-select: none;" :style="{position:'relative',width:(width+marginLeft*2)+'px',height:(height+marginTop*2)+'px'}">
+  <img src="./assets/guitarboard-background.png" style="position: absolute;" :style="{width:width+'px',height:height+'px',left:marginLeft+'px',top:marginTop+'px'}">
+    <svg :width="width+marginLeft*2" :height="height+marginTop*2" style="border: #888 dashed 1px;position:absolute;">
+      <defs>
+        <linearGradient id="Gradient">
+          <stop offset="0%" stop-color="#444" />
+          <stop offset="100%" stop-color="#fff" />
+        </linearGradient>
+      </defs>
       <g :transform="'translate('+marginLeft+','+marginTop+')'">
         <!-- guitar board background -->
         <g>
@@ -18,7 +25,7 @@
           </template>
 
           <!-- frets -->
-          <line v-for="index in 15" :x1="(index-1)*cellWidth" :x2="(index-1)*cellWidth" :y1="0" :y2="cellHeight*5" stroke-width="2" :stroke="fretColor"></line>
+          <rect v-for="index in 15" :x="(index-1)*cellWidth" :y="0" :height="cellHeight*5" width="4" fill="url(#Gradient)"></rect>
           <!-- strings -->
           <line v-for="index in 6" :x1="0" :y1="(index-1)*cellHeight" :x2="width" :y2="(index-1)*cellHeight" stroke-width="2" :stroke="stringColor"></line>
           <!-- header -->
@@ -92,8 +99,8 @@ export default class GuitarBoardView extends Vue {
   private marginTop : number = 20;
   private fretColor : string = "#888";
   private fretHintBackgroundColor : string = "#00000011";
-  private fretHintPointColor : string = "#666";
-  private stringColor : string = "#000000";
+  private fretHintPointColor : string = "#ddd";
+  private stringColor : string = "#fff";
 
   private static noteNames = ["C","#C","D","bE","E","F","#F","G","bA","A","bB","B"];
   private static numberNames = ["1","#1","2","b3","3","4","#4","5","b6","6","b7","7"];
