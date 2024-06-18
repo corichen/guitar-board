@@ -6,6 +6,14 @@ class Chord {
     public notes:Location[] = [];
     public root:number = 4; // 根音所在的弦(0-5)
     public tone:Tone|null = null;
+    public get rootNote() {
+        for(let i = 0 ; i < this.notes.length; ++i) {
+            if(this.notes[i].str == this.root) {
+                return this.notes[i];
+            }
+        }
+        return null;
+    }
     public get nameInTone() {
         if(this.tone == null) {
             return this.name;

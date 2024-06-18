@@ -4,24 +4,44 @@ import Location from "../GuitarPlayer/Location";
 
 export default class GuitarChordLibrary {
 
-    public static searchNaturalToneChords(tone:string,baseTone:Tone|null = null) {
+    private static createRegex(noteName:string,types:string[]) {
+
+    }
+
+    public static searchNaturalToneChords(tone:string,options:{
+        baseTone?:Tone, // 设置首调
+        chord7?:boolean, // 七和弦
+        sus?:boolean, // 挂二 挂四和弦
+        transform?:boolean, // 转位和弦
+        rootMin?:number, // 根音的最小品
+        rootMax?:number   // 根音的最大品
+    }) {
         let chords : Chord[] = [];
         const names = ['C',"#C","D","bE","E","F","#F","G","bA","A","bB","B"];
         let fromIndex = names.indexOf(tone);
         if(fromIndex < 0) {
             return chords;
         }
-        let level1Chords = this.searchChords(new RegExp("^"+names[fromIndex]+"(maj7|sus2|sus4|add6)?$"));
-        let level2Chords = this.searchChords(new RegExp("^"+names[(fromIndex+2)%names.length]+"m(7|sus2|sus4)?$"));
-        let level3Chords = this.searchChords(new RegExp("^"+names[(fromIndex+4)%names.length]+"m(7|sus2|sus4)?$"));
-        let level4Chords = this.searchChords(new RegExp("^"+names[(fromIndex+5)%names.length]+"(maj7|sus2|sus4|add6)?$"));
-        let level5Chords = this.searchChords(new RegExp("^"+names[(fromIndex+7)%names.length]+"(7|sus2|sus4)?$"));
-        let level6Chords = this.searchChords(new RegExp("^"+names[(fromIndex+9)%names.length]+"m(7|sus2|sus4)?$"));
-        let level7Chords = this.searchChords(new RegExp("^"+names[(fromIndex+9)%names.length]+"(dim|m7b5)$"));
+
+        let level1Chords = this.searchChords(new RegExp("^"+names[(fromIndex)%names.length]+`(${options.chord7?'maj7':''}|${options.sus?"sus2|sus4":""})?${options.transform?'(/.+)?':''}$`));
+        let level2Chords = this.searchChords(new RegExp("^"+names[(fromIndex+2)%names.length]+`m${options.chord7?'(7)?':''}${options.transform?'(/.+)?':''}$`));
+        let level3Chords = this.searchChords(new RegExp("^"+names[(fromIndex+4)%names.length]+`m${options.chord7?'(7)?':''}${options.transform?'(/.+)?':''}$`));
+        let level4Chords = this.searchChords(new RegExp("^"+names[(fromIndex+5)%names.length]+`(${options.chord7?'maj7':''}|${options.sus?"sus2|sus4":""}|add6)?${options.transform?'(/.+)?':''}$`));
+        let level5Chords = this.searchChords(new RegExp("^"+names[(fromIndex+7)%names.length]+`(${options.chord7?'7':''}|${options.sus?"sus2|sus4":""})?${options.transform?'(/.+)?':''}$`));
+        let level6Chords = this.searchChords(new RegExp("^"+names[(fromIndex+9)%names.length]+`m${options.chord7?'(7)?':''}${options.transform?'(/.+)?':''}$`));
+        let level7Chords = this.searchChords(new RegExp("^"+names[(fromIndex+11)%names.length]+`(dim|${options.chord7?'m7b5':''})${options.transform?'(/.+)?':''}$`));
         chords = chords.concat(level1Chords).concat(level2Chords).concat(level3Chords).concat(level4Chords).concat(level5Chords).concat(level6Chords).concat(level7Chords);
         
-        if(baseTone != null) {
-            chords.map((chord)=>{chord.tone=baseTone;});
+        if(options.baseTone != null) {
+            chords.map((chord)=>{if(options.baseTone)chord.tone=options.baseTone;});
+        }
+        if(options.rootMin != null) {
+            let min = options.rootMin;
+            chords = chords.filter((chord)=>{if(chord.rootNote==null){return false;}return chord.rootNote.index >= min;});
+        }
+        if(options.rootMax != null) {
+            let max = options.rootMax;
+            chords = chords.filter((chord)=>{if(chord.rootNote==null){return false;}return chord.rootNote.index < max;});
         }
         return chords;
     }
@@ -281,6 +301,12 @@ export default class GuitarChordLibrary {
             slide:11,
             root: 3,
             notes:"xx0131"
+        },
+        {
+            name: "G/B",
+            slide: 11,
+            root: 2,
+            notes: "x20033"
         },
         {
             name:"Fmaj7",

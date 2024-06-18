@@ -51,9 +51,16 @@ import Tone from '../GuitarBoard/Tone';
     }
 
     private loadChords() {
-      //this.chords = GuitarChordLibrary.searchChords(new RegExp(this.keyword),false);
+     // this.chords = GuitarChordLibrary.searchChords(new RegExp(this.keyword),false);
       let tone = ["C","#C","D","bE","E","F","#F","G","bA","A","bB","B"].indexOf(this.keyword);
-      this.chords = GuitarChordLibrary.searchNaturalToneChords(this.keyword,tone);
+      this.chords = GuitarChordLibrary.searchNaturalToneChords(this.keyword,{
+        baseTone:tone,
+        chord7:true,
+        sus:false,
+        transform:true,
+        rootMin:3,
+        rootMax:8
+      });
     }
 
     mounted() {
