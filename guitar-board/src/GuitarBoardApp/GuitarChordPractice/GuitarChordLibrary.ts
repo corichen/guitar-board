@@ -10,6 +10,10 @@ export default class GuitarChordLibrary {
 
     public static searchNaturalToneChords(tone:string,options:{
         baseTone?:Tone, // 设置首调
+        natural?:boolean,// 顺阶和弦
+        chord3?:boolean, // 三和弦
+        aug?:boolean, // 增和弦
+        dim?:boolean, // 渐和弦
         chord7?:boolean, // 七和弦
         sus?:boolean, // 挂二 挂四和弦
         transform?:boolean, // 转位和弦
@@ -23,17 +27,43 @@ export default class GuitarChordLibrary {
             return chords;
         }
 
-        let level1Chords = this.searchChords(new RegExp("^"+names[(fromIndex)%names.length]+`(${options.chord7?'maj7':''}|${options.sus?"sus2|sus4":""})?${options.transform?'(/.+)?':''}$`));
-        let level2Chords = this.searchChords(new RegExp("^"+names[(fromIndex+2)%names.length]+`m${options.chord7?'(7)?':''}${options.transform?'(/.+)?':''}$`));
-        let level3Chords = this.searchChords(new RegExp("^"+names[(fromIndex+4)%names.length]+`m${options.chord7?'(7)?':''}${options.transform?'(/.+)?':''}$`));
-        let level4Chords = this.searchChords(new RegExp("^"+names[(fromIndex+5)%names.length]+`(${options.chord7?'maj7':''}|${options.sus?"sus2|sus4":""}|add6)?${options.transform?'(/.+)?':''}$`));
-        let level5Chords = this.searchChords(new RegExp("^"+names[(fromIndex+7)%names.length]+`(${options.chord7?'7':''}|${options.sus?"sus2|sus4":""})?${options.transform?'(/.+)?':''}$`));
-        let level6Chords = this.searchChords(new RegExp("^"+names[(fromIndex+9)%names.length]+`m${options.chord7?'(7)?':''}${options.transform?'(/.+)?':''}$`));
-        let level7Chords = this.searchChords(new RegExp("^"+names[(fromIndex+11)%names.length]+`(dim|${options.chord7?'m7b5':''})${options.transform?'(/.+)?':''}$`));
+        let level1Chords = this.searchChords(new RegExp("^"+names[(fromIndex)%names.length]+".*$"));
+        let level2Chords = this.searchChords(new RegExp("^"+names[(fromIndex+2)%names.length]+".*$"));
+        let level3Chords = this.searchChords(new RegExp("^"+names[(fromIndex+4)%names.length]+".*$"));
+        let level4Chords = this.searchChords(new RegExp("^"+names[(fromIndex+5)%names.length]+".*$"));
+        let level5Chords = this.searchChords(new RegExp("^"+names[(fromIndex+7)%names.length]+".*$"));
+        let level6Chords = this.searchChords(new RegExp("^"+names[(fromIndex+9)%names.length]+".*$"));
+        let level7Chords = this.searchChords(new RegExp("^"+names[(fromIndex+11)%names.length]+".*$"));
         chords = chords.concat(level1Chords).concat(level2Chords).concat(level3Chords).concat(level4Chords).concat(level5Chords).concat(level6Chords).concat(level7Chords);
         
-        if(options.baseTone != null) {
-            chords.map((chord)=>{if(options.baseTone)chord.tone=options.baseTone;});
+        chords.map((chord)=>{
+            if(options.baseTone != null) {
+                chord.tone=options.baseTone;
+            } else {
+             chord.tone = null;
+            } 
+        });
+
+        if(options.natural != null && options.natural) {
+            chords = chords.filter((chord)=>chord.isNatural);
+        }
+        if(options.chord3 != null && !options.chord3) {
+            chords = chords.filter((chord)=>!chord.isChord3);
+        }
+        if(options.chord7 != null && !options.chord7) {
+            chords = chords.filter((chord)=>!chord.isChord7);
+        }
+        if(options.sus != null && !options.sus) {
+            chords = chords.filter((chord)=>!chord.isSus);
+        }
+        if(options.aug != null && !options.aug) {
+            chords = chords.filter((chord)=>!chord.isAug);
+        }
+        if(options.dim != null && !options.dim) {
+            chords = chords.filter((chord)=>!chord.isDim);
+        }
+        if(options.transform != null && !options.transform) {
+            chords = chords.filter((chord)=>!chord.isTransform);
         }
         if(options.rootMin != null) {
             let min = options.rootMin;
