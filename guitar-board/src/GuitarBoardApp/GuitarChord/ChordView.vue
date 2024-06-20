@@ -18,9 +18,10 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import Chord from './Chord';
-import GuitarPlayer from '../GuitarPlayer/GuitarPlayer';
 
 @Options({
+  emits: ["chord-click","chord-right-click"]
+  ,
   components: {
   },
   props: {
@@ -38,15 +39,12 @@ export default class ChordView extends Vue {
   marginBottom = 26;
 
   onRightClick() {
-    ChordView.guitarPlayer.playNotes(this.chordProp.notes,200);
+    this.$emit("chord-right-click");
   }
 
   onClick(){
-    ChordView.guitarPlayer.playNotes(this.chordProp.notes,30);
+    this.$emit("chord-click");
   }
-
-  static guitarPlayer = new GuitarPlayer();
-
   get width() {
     return this.cellWidth * 5 + this.marginLeft + this.marginRight;
   }
