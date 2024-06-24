@@ -1,6 +1,7 @@
-import Tone from "../GuitarBoard/Tone";
-import Chord from "../GuitarChord/Chord";
+import Tone from "../GuitarPlayer/Tone";
+import Chord from "./Chord";
 import Location from "../GuitarPlayer/Location";
+import GuitarChordSearchOptions from "./GuitarChordSearchOptions";
 
 export default class GuitarChordLibrary {
 
@@ -8,18 +9,7 @@ export default class GuitarChordLibrary {
 
     }
 
-    public static searchNaturalToneChords(tone:string,options:{
-        baseTone?:Tone, // 设置首调
-        natural?:boolean,// 顺阶和弦
-        chord3?:boolean, // 三和弦
-        aug?:boolean, // 增和弦
-        dim?:boolean, // 渐和弦
-        chord7?:boolean, // 七和弦
-        sus?:boolean, // 挂二 挂四和弦
-        transform?:boolean, // 转位和弦
-        rootMin?:number, // 根音的最小品
-        rootMax?:number   // 根音的最大品
-    }) {
+    public static searchNaturalToneChords(tone:string,options:GuitarChordSearchOptions) {
         let chords : Chord[] = [];
         const names = ['C',"#C","D","bE","E","F","#F","G","bA","A","bB","B"];
         let fromIndex = names.indexOf(tone);
@@ -47,6 +37,9 @@ export default class GuitarChordLibrary {
         if(options.natural != null && options.natural) {
             chords = chords.filter((chord)=>chord.isNatural);
         }
+        if(options.chord2 != null && !options.chord2) {
+            chords = chords.filter((chord)=>!chord.isChord2);
+        }
         if(options.chord3 != null && !options.chord3) {
             chords = chords.filter((chord)=>!chord.isChord3);
         }
@@ -64,6 +57,9 @@ export default class GuitarChordLibrary {
         }
         if(options.transform != null && !options.transform) {
             chords = chords.filter((chord)=>!chord.isTransform);
+        }
+        if(options.roots != null) {
+            chords = chords.filter((chord)=>{if(options.roots==null)return true;return options.roots.indexOf(chord.root)>=0;});
         }
         if(options.rootMin != null) {
             let min = options.rootMin;
@@ -92,11 +88,26 @@ export default class GuitarChordLibrary {
               slideFrom = chordObj.slideFrom;
             }
           }
-          let nameFromIndex = names.indexOf(chordObj.name[0]);
+          
           for(let s = slideFrom ; s < slideCount + slideFrom; ++s){
             let chord = new Chord();
             chord.root = chordObj.root;
-            chord.name = names[(nameFromIndex+s+names.length)%names.length]+chordObj.name.substring(1);
+            let newname = "";
+            for(let k = 0 ; k < chordObj.name.length; ++k) {
+                let namec = chordObj.name[k];
+                const nameRegex = /^(b|#)?[A-G]/;
+                let match = nameRegex.exec(chordObj.name.substring(k));
+                if(match != null) {
+                    namec = match[0];
+                    k+=namec.length-1;
+                    let nameFromIndex = names.indexOf(namec);
+                    let newnamec = names[(nameFromIndex+s+names.length)%names.length];
+                    newname += newnamec;
+                } else {
+                    newname += namec;
+                }
+            }
+            chord.name = newname;
             for(let j = 0 ; j < chordObj.notes.length; ++j) {
               let ch = chordObj.notes[j];
               if(ch == 'x') {
@@ -121,6 +132,249 @@ export default class GuitarChordLibrary {
       }
 
     static chordSources = [
+        {
+            name: "GA",
+            slide: 11,
+            root:5,
+            notes:"30"
+        },
+        {
+            name: "AbB",
+            slideFrom: -1,
+            slide: 10,
+            root:5,
+            notes:"51"
+        },
+        {
+            name: "GbB",
+            slideFrom: -1,
+            slide: 12,
+            root:5,
+            notes:"31"
+        },
+        {
+            name: "GB",
+            slideFrom: -2,
+            slide: 13,
+            root:5,
+            notes:"32"
+        },
+        {
+            name: "GC",
+            slideFrom: -3,
+            slide: 14,
+            root:5,
+            notes:"33"
+        },
+        {
+            name: "G#C",
+            slideFrom: -3,
+            slide: 13,
+            root:5,
+            notes:"34"
+        },
+        {
+            name: "GD",
+            slideFrom: -3,
+            slide: 12,
+            root:5,
+            notes:"35"
+        },
+        {
+            name: "GD",
+            slideFrom: 0,
+            slide: 11,
+            root:5,
+            notes:"3x0"
+        },
+        {
+            name: "GbE",
+            slideFrom: -3,
+            slide: 11,
+            root:5,
+            notes:"36"
+        },
+        {
+            name: "GbE",
+            slideFrom: -1,
+            slide: 12,
+            root:5,
+            notes:"3x1"
+        },
+        {
+            name: "GE",
+            slideFrom: -2,
+            slide: 13,
+            root:5,
+            notes:"3x2"
+        },
+        {
+            name: "G#F",
+            slideFrom: -3,
+            slide: 13,
+            root:5,
+            notes:"3x4"
+        },
+        {
+            name: "GG",
+            slideFrom: -3,
+            slide: 12,
+            root:5,
+            notes:"3x5"
+        },
+        {
+            name: "GG",
+            slideFrom: 0,
+            slide: 11,
+            root:5,
+            notes:"3xx0"
+        },
+        {
+            name: "DbE",
+            slideFrom: -1,
+            slide: 9,
+            root:4,
+            notes:"x51"
+        },
+        {
+            name: "CD",
+            slideFrom: 0,
+            slide: 11,
+            root:4,
+            notes:"x30"
+        },
+        {
+            name: "CbE",
+            slideFrom: -1,
+            slide: 12,
+            root:4,
+            notes:"x31"
+        },
+        {
+            name: "CE",
+            slideFrom: -2,
+            slide: 13,
+            root:4,
+            notes:"x32"
+        },
+        {
+            name: "CF",
+            slideFrom: -3,
+            slide: 14,
+            root:4,
+            notes:"x33"
+        },
+        {
+            name: "C#F",
+            slideFrom: -3,
+            slide: 13,
+            root:4,
+            notes:"x34"
+        },
+        {
+            name: "DbE",
+            slideFrom: -1,
+            slide: 10,
+            root:4,
+            notes:"x51"
+        },
+        {
+            name: "CG",
+            slideFrom: -3,
+            slide: 12,
+            root:4,
+            notes:"x35"
+        },
+        {
+            name: "CG",
+            slideFrom: 0,
+            slide: 11,
+            root:4,
+            notes:"x3x0"
+        },
+        {
+            name: "CbA",
+            slideFrom: -3,
+            slide: 11,
+            root:4,
+            notes:"x36"
+        },
+        {
+            name: "CbA",
+            slideFrom: -1,
+            slide: 12,
+            root:4,
+            notes:"x3x1"
+        },
+        {
+            name: "CA",
+            slideFrom: -2,
+            slide: 13,
+            root:4,
+            notes:"x3x2"
+        },
+        {
+            name: "CbB",
+            slideFrom: -3,
+            slide: 14,
+            root:4,
+            notes:"x3x3"
+        },
+        {
+            name: "CB",
+            slideFrom: -3,
+            slide: 13,
+            root:4,
+            notes:"x3x4"
+        },
+        {
+            name: "CB",
+            slideFrom: 0,
+            slide: 11,
+            root:4,
+            notes:"x3xx0"
+        },
+        {
+            name: "CC",
+            slideFrom: -3,
+            slide: 12,
+            root:4,
+            notes:"x3x5"
+        },
+        {
+            name: "CC",
+            slideFrom: -1,
+            slide: 12,
+            root:4,
+            notes:"x3xx1"
+        },
+        {
+            name:"GbA",
+            slideFrom: -1,
+            slide:10,
+            root:3,
+            notes:"xx51"
+        },
+        {
+            name:"FG",
+            slide:11,
+            root:3,
+            notes:"xx30"
+        },
+        {
+            name:"FbA",
+            slideFrom:-1,
+            slide:12,
+            root:3,
+            notes:"xx31"
+        },
+        {
+            name:"FA",
+            slideFrom:-2,
+            slide:13,
+            root:3,
+            notes:"xx32"
+        },
         {
             name: "G",
             slide: 11,

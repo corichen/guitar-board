@@ -19,38 +19,33 @@
         <option value="11">B</option>
       </select>
       顺阶和弦:<input type="checkbox" v-model.boolean="chordOptions.natural" class="inputSpacing">
+      音程:<input type="checkbox" v-model.boolean="chordOptions.chord2" class="inputSpacing">
       三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord3" class="inputSpacing">
       七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord7" class="inputSpacing">
       挂留和弦:<input type="checkbox" v-model.boolean="chordOptions.sus" class="inputSpacing">
       增和弦:<input type="checkbox" v-model.boolean="chordOptions.aug" class="inputSpacing">
       减和弦:<input type="checkbox" v-model.boolean="chordOptions.dim" class="inputSpacing">
-      转位和弦:<input type="checkbox" v-model.boolean="chordOptions.transform" class="inputSpacing">
+      转位和弦:<input type="checkbox" v-model.boolean="chordOptions.transform" class="inputSpacing"><br>
       根音最低品:<input type="range" v-model.number="chordOptions.rootMin" min="0" max="12" step="1" ><div style="display: inline-block;" class="inputSpacing">{{ chordOptions.rootMin }}</div>
       根音最高品:<input type="range" v-model.number="chordOptions.rootMax" min="3" max="15" step="1">{{ chordOptions.rootMax }}
+      根音在6弦:<input type="checkbox" v-model.boolean="root5" class="inputSpacing">
+      根音在5弦:<input type="checkbox" v-model.boolean="root4" class="inputSpacing">
+      根音在4弦:<input type="checkbox" v-model.boolean="root3" class="inputSpacing">
+      根音在3弦:<input type="checkbox" v-model.boolean="root2" class="inputSpacing">
+      根音在2弦:<input type="checkbox" v-model.boolean="root1" class="inputSpacing">
     </div>
     <div style="padding:4px;margin-top:10px;border:1px dashed #000000;display:inline-block;">
-      听力练习:<br>
-      弹奏模式:<input v-model.number="playDelay" type="radio" name="playMode" :value="20">扫弦 <input v-model.number="playDelay" type="radio" name="playMode" :value="160">分解 <br>
-      练习模式:<input v-model.number="practiceMode" type="radio" name="mode" :value="3">练习 <input v-model.number="practiceMode" type="radio" name="mode" :value="0">听级数 <input v-model.number="practiceMode" type="radio" name="mode" :value="1">听色彩 <input v-model.number="practiceMode" type="radio" name="mode" :value="2">听和弦 <br>
-      <button @click="playPracticeChord()">出题</button><button style="margin-left: 10px;" @click="playLevel1()">听一级</button>
+      弹奏模式:<input v-model.number="playDelay" type="radio" name="playMode" :value="10">扫弦 <input v-model.number="playDelay" type="radio" name="playMode" :value="200">分解 <br>
     </div><br>
-    <div style="border: 1px dashed #000000;display:inline-block;margin-top:4px;">
-      听力作答:<br>
-      <div v-if="practiceMode == 0" style="display:flex;flex-direction: row;padding:6px;">
-        <button @click="onChooseLevel(level)" v-for="level in 7" style="margin-left:4px;margin-right:4px;">{{level}}级</button>
-      </div>
-      <div v-if="practiceMode == 1" style="display:flex;flex-direction: row;padding:6px;">
-        <button v-for="color in ['大三','小三','增三','减三','大七','小七','属七','半减七']" style="margin-left:4px;margin-right:4px;">{{color}}</button>
-      </div>
-    </div><br>
-
+    <GuitarBoardView ref="guitarBoradView"></GuitarBoardView>
+  
       <div style="margin-top: 10px;">
         <table>
           <tr v-for="level in 7">
             <td>{{level}}级</td>
             <td style="display: flex;flex-direction: row;flex-wrap:nowrap;">
               <template v-for="chord in chords.sort((a:Chord,b:Chord)=>{if(a.rootNote!=null && b.rootNote!=null)return a.rootNote.index-b.rootNote.index;return 0;})">
-                <ChordView v-if="chord.levelInTone==level" :chord="chord" @chord-click="onChordClick(chord)"></ChordView>
+                <ChordView v-if="chord.levelInTone==level" :chord="chord" @chord-click="onChordClick(chord)" :style="{border:chord==this.selectedChord?'1px dashed #000':'none'}" ></ChordView>
               </template>
             </td>
           </tr>
@@ -66,19 +61,11 @@ import GuitarBoardView from '../GuitarBoard/GuitarBoardView.vue';
 import NoteEvent from '../GuitarBoard/NoteEvent';
 import ChordView from '../GuitarChord/ChordView.vue';
 import Chord from '../GuitarChord/Chord';
-import GuitarChordLibrary from "./GuitarChordLibrary";
+import GuitarChordLibrary from "../GuitarChord/GuitarChordLibrary";
 import Location from '../GuitarPlayer/Location';  
-import Tone from '../GuitarBoard/Tone';
+import Tone from '../GuitarPlayer/Tone';
 import GuitarPlayer from '../GuitarPlayer/GuitarPlayer';
-
-
-enum PracticeMode {
-  Level,
-  Color,
-  Chord,
-  Practive
-}
-
+import GuitarChordSearchOptions from '../GuitarChord/GuitarChordSearchOptions';
 
 
   @Options({
@@ -92,93 +79,115 @@ enum PracticeMode {
           this.loadChords();
         },
         deep:true
-      },
-      searchTone(){
-        this.loadChords();
-      },
-      showNumberName(){
-        this.loadChords();
       }
     }
   })
   export default class GuitarChordPracticeView extends Vue {
     
+
     chords : Chord[] = [];
 
-    chordOptions = {
+    selectedChord : Chord | null = null;
+
+    chordOptions : GuitarChordSearchOptions = {
       baseTone: Tone.C,
-      natural: true,
-      chord3:true,
-      chord7:true,
-      sus:true,
-      aug:true,
-      dim:true,
-      transform:true,
+      natural: false,
+      chord2:true,
+      chord3:false,
+      chord7:false,
+      sus:false,
+      aug:false,
+      dim:false,
+      transform:false,
+      roots:[3],
       rootMin:0,
       rootMax:15
     }
 
-    practiceMode : PracticeMode = PracticeMode.Level;
+    get root5(){
+      return this.getRootN(5);
+    }
+
+    set root5(root) {
+      this.setRootN(5,root);
+    }
+
+    get root4(){
+      return this.getRootN(4);
+    }
+
+    set root4(root) {
+      this.setRootN(4,root);
+    }
+
+    get root3(){
+      return this.getRootN(3);
+    }
+
+    set root3(root) {
+      this.setRootN(3,root);
+    }
+
+    get root2(){
+      return this.getRootN(2);
+    }
+
+    set root2(root) {
+      this.setRootN(2,root);
+    }
+
+    get root1(){
+      return this.getRootN(1);
+    }
+
+    set root1(root) {
+      this.setRootN(1,root);
+    }
+
+    private setRootN(n:number,root:boolean) {
+      let oldValue = this.getRootN(n);
+      if(oldValue == root) {
+        return;
+      }
+      if(root) {
+        this.chordOptions.roots.push(n);
+      } else {
+        let index = this.chordOptions.roots.indexOf(n);
+        if(index >= 0) {
+          this.chordOptions.roots.splice(index,1);
+        }
+      }
+    }
+
+    private getRootN(n:number) {
+      return this.chordOptions.roots.indexOf(n) >= 0;
+    }
 
     guitarPlayer : GuitarPlayer = new GuitarPlayer();
 
-    playDelay : number = 20;
-
-    public onChooseLevel(level:number) {
-      if(this.randomChord == null) {
-        return;
-      }
-      if(this.randomChord.levelInTone == level) {
-        this.changePracticeChord();  
-        (this.$refs.rightAudio as any).currentTime = 0;
-        (this.$refs.rightAudio as any).play();
-        setTimeout(()=>{
-          this.playPracticeChord();
-        },1500);
-      } else {
-        (this.$refs.wrongAudio as any).currentTime = 0;
-        (this.$refs.wrongAudio as any).play();
-      }
-    }
+    playDelay : number = 10;
 
     public onChordClick(chord:Chord) {
-      if(this.practiceMode == PracticeMode.Practive) {
-        this.guitarPlayer.playNotes(chord.notes,this.playDelay);
-        return;
-      }
+      this.selectedChord = chord;
+      this.guitarPlayer.playNotes(chord.notes,this.playDelay);
+      this.guitarBoardView.setVisible(false);
+      this.guitarBoardView.setVisible(true,this.guitarBoardView.getNaturalNotes());
+      this.guitarBoardView.setVisible(true,chord.notes);
+      this.guitarBoardView.setFocus(false);
+      this.guitarBoardView.setFocus(true,chord.notes);
     }
-
-    playLevel1() {
-      let names = ["C","#C","D","bE","E","F","#F","G","bA","A","bB","B"];
-      let baseName = names[this.chordOptions.baseTone];
-      let chords = GuitarChordLibrary.searchChords(new RegExp(`^${baseName}$`));
-      this.guitarPlayer.playNotes(chords[0].notes,this.playDelay);
-    }
-
-    private changePracticeChord() {
-      let randomIndex = Math.floor(Math.random() * this.chords.length);
-      this.randomChord = this.chords[randomIndex];
-    }
-
-    public playPracticeChord() {
-      if(this.chords.length == 0) {
-        return;
-      }
-      if(this.randomChord == null) {
-        let randomIndex = Math.floor(Math.random() * this.chords.length);
-        this.randomChord = this.chords[randomIndex]; 
-      }
-      this.guitarPlayer.playNotes(this.randomChord.notes,this.playDelay);
-    }
-
-    private randomChord : Chord | null = null;
 
     private loadChords() {
-     // this.chords = GuitarChordLibrary.searchChords(new RegExp(this.keyword),false);
       let names = ["C","#C","D","bE","E","F","#F","G","bA","A","bB","B"];
-
-
       this.chords = GuitarChordLibrary.searchNaturalToneChords(names[this.chordOptions.baseTone],this.chordOptions);
+      this.guitarBoardView.setTone(this.chordOptions.baseTone);
+      this.guitarBoardView.setVisible(false);
+      this.guitarBoardView.setVisible(true,this.guitarBoardView.getNaturalNotes());
+      this.guitarBoardView.setFocus(false);
+    }
+
+    get guitarBoardView() {
+      return this.$refs.guitarBoradView as GuitarBoardView;
     }
 
     mounted() {

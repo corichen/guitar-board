@@ -1,6 +1,5 @@
 <template>
   <div style="user-select: none;" :style="{position:'relative',width:(width+marginLeft*2)+'px',height:(height+marginTop*2)+'px'}">
-  <img src="./assets/guitarboard-background.png" style="position: absolute;" :style="{width:width+'px',height:height+'px',left:marginLeft+'px',top:marginTop+'px'}">
     <svg :width="width+marginLeft*2" :height="height+marginTop*2" style="border: #888 dashed 1px;position:absolute;">
       <defs>
         <linearGradient id="Gradient">
@@ -25,7 +24,7 @@
           </template>
 
           <!-- frets -->
-          <rect v-for="index in 15" :x="(index-1)*cellWidth" :y="0" :height="cellHeight*5" width="4" fill="url(#Gradient)"></rect>
+          <rect v-for="index in 15" :x="(index-1)*cellWidth" :y="0" :height="cellHeight*5" width="2" :fill="fretColor"></rect>
           <!-- strings -->
           <line v-for="index in 6" :x1="0" :y1="(index-1)*cellHeight" :x2="width" :y2="(index-1)*cellHeight" stroke-width="2" :stroke="stringColor"></line>
           <!-- header -->
@@ -59,7 +58,7 @@
 import {Options, Vue} from 'vue-class-component';
 import GuitarPlayer from '../GuitarPlayer/GuitarPlayer';
 import NoteEvent from './NoteEvent';
-import Tone from './Tone';
+import Tone from '../GuitarPlayer/Tone';
 import NoteStyle from './NoteStyle';
 import Location from '../GuitarPlayer/Location';
 
@@ -97,10 +96,10 @@ export default class GuitarBoardView extends Vue {
   private noteWidth : number = 28;
   private marginLeft : number = 40;
   private marginTop : number = 20;
-  private fretColor : string = "#888";
-  private fretHintBackgroundColor : string = "#00000011";
-  private fretHintPointColor : string = "#ddd";
-  private stringColor : string = "#fff";
+  private fretColor : string = "#000";
+  private fretHintBackgroundColor : string = "#ddd";
+  private fretHintPointColor : string = "#000";
+  private stringColor : string = "#000";
 
   private static noteNames = ["C","#C","D","bE","E","F","#F","G","bA","A","bB","B"];
   private static numberNames = ["1","#1","2","b3","3","4","#4","5","b6","6","b7","7"];
@@ -189,6 +188,31 @@ export default class GuitarBoardView extends Vue {
 
   private isNoteLower(str:number,index:number) {
     return this.getNoteName(str,index).startsWith("b");
+  }
+
+  public getUnNaturalNotes():Location[] {
+    let notes:Location[] = [];
+    for(let i = 0 ; i < this.strings.length; i++) {
+      for(let j = 0 ; j < this.strings[i].length; j++) {
+        if(this.isNoteUpper(i,j) || this.isNoteLower(i,j)) {
+          notes.push(new Location(i,j));
+        }
+      }
+    }
+    return notes;
+  }
+
+  public getNaturalNotes():Location[] {
+    let notes:Location[] = [];
+    for(let i = 0 ; i < this.strings.length; i++) {
+      for(let j = 0 ; j < this.strings[i].length; j++) {
+        if(this.isNoteUpper(i,j) || this.isNoteLower(i,j)) {
+          continue;
+        }
+        notes.push(new Location(i,j));
+      }
+    }
+    return notes;
   }
 
   private getNoteName(str:number,index:number) : string {

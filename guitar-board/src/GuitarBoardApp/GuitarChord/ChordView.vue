@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <svg @contextmenu.prevent="onRightClick" @click="onClick" :width="width" :height="height" style="border: 1px dashed #000;">
+      <svg @contextmenu.prevent="onRightClick" @click="onClick" :width="width" :height="height">
         <g :transform="'translate('+marginLeft+','+marginTop+')'">
           <rect v-if="baseIndex==1" x="-0.5" y="-2" :width="cellWidth*5+1" :height="3" fill="#000"></rect>
           <line v-for="row in (rowCount+1)" x1="0" :x2="cellWidth*5" :y1="cellHeight*(row-1)" :y2="cellHeight*(row-1)" stroke="#000"></line>

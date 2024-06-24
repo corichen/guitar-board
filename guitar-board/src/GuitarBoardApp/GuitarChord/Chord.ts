@@ -1,4 +1,4 @@
-import Tone from "../GuitarBoard/Tone";
+import Tone from "../GuitarPlayer/Tone";
 import Location from "../GuitarPlayer/Location";
 
 class Chord {
@@ -49,6 +49,10 @@ class Chord {
             }
         }
         return true;
+    }
+
+    public get isChord2() {
+        return this.notes.length == 2;
     }
 
     public get isChord3() {
