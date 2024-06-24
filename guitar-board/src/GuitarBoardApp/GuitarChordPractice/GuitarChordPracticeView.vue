@@ -35,7 +35,9 @@
       根音在2弦:<input type="checkbox" v-model.boolean="root1" class="inputSpacing">
     </div>
     <div style="padding:4px;margin-top:10px;border:1px dashed #000000;display:inline-block;">
-      弹奏模式:<input v-model.number="playDelay" type="radio" name="playMode" :value="10">扫弦 <input v-model.number="playDelay" type="radio" name="playMode" :value="200">分解 <br>
+      乐器:<input v-model.number="playDelay" type="radio" name="instrument" :value="1">钢琴 <input v-model.number="playDelay" type="radio" name="instrument" :value="2">吉他 <br>
+
+      弹奏模式:<input v-model.number="playDelay" type="radio" name="playMode" :value="0">扫弦 <input v-model.number="playDelay" type="radio" name="playMode" :value="200">分解 <br>
     </div><br>
     <GuitarBoardView ref="guitarBoradView"></GuitarBoardView>
   
@@ -66,6 +68,7 @@ import Location from '../GuitarPlayer/Location';
 import Tone from '../GuitarPlayer/Tone';
 import GuitarPlayer from '../GuitarPlayer/GuitarPlayer';
 import GuitarChordSearchOptions from '../GuitarChord/GuitarChordSearchOptions';
+import Instrument from '../GuitarPlayer/Instrument';
 
 
   @Options({
@@ -85,6 +88,8 @@ import GuitarChordSearchOptions from '../GuitarChord/GuitarChordSearchOptions';
   export default class GuitarChordPracticeView extends Vue {
     
 
+    _instrument : Instrument = Instrument.Guitar;
+
     chords : Chord[] = [];
 
     selectedChord : Chord | null = null;
@@ -99,9 +104,18 @@ import GuitarChordSearchOptions from '../GuitarChord/GuitarChordSearchOptions';
       aug:false,
       dim:false,
       transform:false,
-      roots:[3],
+      roots:[5],
       rootMin:0,
       rootMax:15
+    }
+
+    set instrument(instrument:Instrument) {
+      this._instrument = instrument;
+      this.guitarPlayer.changeInstrument(instrument);
+    }
+
+    get instrument() {
+      return this._instrument;
     }
 
     get root5(){
@@ -165,7 +179,7 @@ import GuitarChordSearchOptions from '../GuitarChord/GuitarChordSearchOptions';
 
     guitarPlayer : GuitarPlayer = new GuitarPlayer();
 
-    playDelay : number = 10;
+    playDelay : number = 0;
 
     public onChordClick(chord:Chord) {
       this.selectedChord = chord;

@@ -1,3 +1,4 @@
+import Instrument from "./Instrument";
 import Location from "./Location";
 
 export default class GuitarPlayer {
@@ -6,103 +7,156 @@ export default class GuitarPlayer {
     private audioContext : any = null;
     private audioData : any = null;
 
-    constructor() {
-        this.noteIndex = [
-            {
-                string: 5,
-                index: 0,
-                offset: -8,
-                begin:0,
-                end:3.8
-            },
-            {
-                string: 4,
-                index: 0,
-                offset: -3,
-                begin:3.96,
-                end:7.7
-            },
-            {
-                string: 3,
-                index: 0,
-                offset: 2,
-                begin:7.79,
-                end:10.9
-            },
-            {
-                string: 2,
-                index: 0,
-                offset: 7,
-                begin:11,
-                end:14
-            },
-            {
-                string: 1,
-                index: 0,
-                offset: 11,
-                begin: 14.04,
-                end: 16.8
-            },
-            {
-                string: 0,
-                index: 0,
-                offset: 16,
-                begin: 16.8,
-                end: 19.4
-            },
-            {
-                string: 5,
-                index: 7,
-                offset: -1,
-                begin: 19.4,
-                end:21.8
-            },
-            {
-                string: 4,
-                index: 7,
-                offset: 4,
-                begin: 21.9,
-                end: 24.4
-            }
-            ,
-            {
-                string: 3,
-                index: 7,
-                offset: 9,
-                begin: 24.55,
-                end: 27
-            },
-            {
-                string: 2,
-                index: 7,
-                offset: 14,
-                begin: 27.06,
-                end: 29.2
-            },
-            {
-                string: 1,
-                index: 7,
-                offset: 18,
-                begin: 29.35,
-                end: 31.4
-            },
-            {
-                string: 0,
-                index: 7,
-                offset: 23,
-                begin: 31.48,
-                end: 33.9
-            }
+    static guitarIndex =  [
+        {
+            string: 5,
+            index: 0,
+            begin:0,
+            end:3.8
+        },
+        {
+            string: 4,
+            index: 0,
+            begin:3.96,
+            end:7.7
+        },
+        {
+            string: 3,
+            index: 0,
+            begin:7.79,
+            end:10.9
+        },
+        {
+            string: 2,
+            index: 0,
+            begin:11,
+            end:14
+        },
+        {
+            string: 1,
+            index: 0,
+            begin: 14.04,
+            end: 16.8
+        },
+        {
+            string: 0,
+            index: 0,
+            begin: 16.8,
+            end: 19.4
+        },
+        {
+            string: 5,
+            index: 7,
+            begin: 19.4,
+            end:21.8
+        },
+        {
+            string: 4,
+            index: 7,
+            begin: 21.9,
+            end: 24.4
+        }
+        ,
+        {
+            string: 3,
+            index: 7,
+            begin: 24.55,
+            end: 27
+        },
+        {
+            string: 2,
+            index: 7,
+            begin: 27.06,
+            end: 29.2
+        },
+        {
+            string: 1,
+            index: 7,
+            begin: 29.35,
+            end: 31.4
+        },
+        {
+            string: 0,
+            index: 7,
+            begin: 31.48,
+            end: 33.9
+        }
+    ];
 
-        ];
+    static pianoIndex = [
+        {
+            string: 5,
+            index: 8,
+            begin: 0.06,
+            end: 3.5
+        },
+        {
+            string: 4,
+            index: 7,
+            begin: 3.5,
+            end: 6.92
+        },
+        {
+            string: 3,
+            index: 5,
+            begin: 6.92,
+            end: 10.35
+        },
+        {
+            string: 3,
+            index: 10,
+            begin: 10.35,
+            end: 13.8
+        },
+        {
+            string: 2,
+            index: 9,
+            begin: 13.8,
+            end: 16
+        },
+        {
+            string: 1,
+            index: 8,
+            begin: 17.2,
+            end: 20
+        },
+        {
+            string: 0,
+            index: 8,
+            begin: 20.6,
+            end: 24
+        }
+    ]
+
+    constructor() {
+        this.noteIndex = GuitarPlayer.guitarIndex;
     }
-    private async init() {
+
+
+    instrument : Instrument = Instrument.None;
+
+    public async changeInstrument(instrument:Instrument) {
+        if(this.instrument == instrument) {
+            return;
+        }
+        this.instrument = instrument;
+        if(instrument == Instrument.Guitar) {
+            this.noteIndex = GuitarPlayer.guitarIndex;
+        } else {
+            this.noteIndex = GuitarPlayer.pianoIndex;
+        }
+        let guitarAudioSource = require("./assets/guitar.mp3");
+        let pianoAudioSource = require("./assets/piano.mp3");
+        let audioSource = guitarAudioSource;
+        if(instrument == Instrument.Piano) {
+            audioSource = pianoAudioSource;
+        }
         window.AudioContext = window.AudioContext;
         this.audioContext = new AudioContext({latencyHint:0});
         return new Promise((resolve,reject)=>{
             let xml = new XMLHttpRequest();
             xml.responseType = 'arraybuffer';
-            xml.open('GET', require("./assets/guitar.mp3"), true);
+            xml.open('GET', audioSource, true);
             xml.onload = ()=>{
                 this.audioContext.decodeAudioData(
                     xml.response,
@@ -120,6 +174,7 @@ export default class GuitarPlayer {
             xml.send();
         })
     }
+
     playSilence() {
         // 播放一个听不见的声音，避免正常播放时缺少音头。
         let bufferSource;
@@ -157,7 +212,7 @@ export default class GuitarPlayer {
     }
     public async playNote(string:number,index:number) {
         if(this.audioData == null) {
-            await this.init();
+            await this.changeInstrument(Instrument.Piano);
         }
 
         let sampleNotes = [];
