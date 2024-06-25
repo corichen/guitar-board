@@ -15,6 +15,15 @@ class Chord {
         return null;
     }
 
+    public hasNoteInString(str:number) {
+        for(let i = 0 ; i < this.notes.length; ++i) {
+            if(this.notes[i].str == str) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private getNoteIndex(location:Location) {
         if(location.str == 0) {
             return 4 + location.index;
@@ -56,7 +65,7 @@ class Chord {
     }
 
     public get isChord_3() {
-        return /^(#|b)?[A-G]$/.test(this.name);
+        return /^(#|b)?[A-G](\/(#|b)?[A-G])?$/.test(this.name);
     }
 
     public get isChord_m3() {
@@ -85,6 +94,10 @@ class Chord {
 
     public get isChord_m7() {
         return  /^(#|b)?[A-G]m7$/.test(this.name);
+    }
+
+    public get isChord_m7b5() {
+        return  /^(#|b)?[A-G]m7b5$/.test(this.name);
     }
 
     public get isChord_7() {

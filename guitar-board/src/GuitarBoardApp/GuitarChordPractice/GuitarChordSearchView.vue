@@ -34,6 +34,13 @@
       减七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_dim7" class="inputSpacing">
 
       <br>
+      <template v-if="chordOptions.chord_2">
+      音程:
+      <template v-for="index in 21">
+        {{ getIntervalName(index) }}<input type="checkbox" @change="setIntervalOn(index,($event.target as any).checked)" :checked="getIntervalOn(index)" class="inputSpacing">
+      </template>
+      <br>
+    </template>
 
       根音最低品:<input type="range" v-model.number="chordOptions.rootMin" min="0" max="12" step="1" ><div style="display: inline-block;" class="inputSpacing">{{ chordOptions.rootMin }}</div>
       根音最高品:<input type="range" v-model.number="chordOptions.rootMax" min="3" max="15" step="1">{{ chordOptions.rootMax }}
@@ -41,10 +48,7 @@
         根音在{{ index+1 }}弦:<input type="checkbox" @change="setRootN(index,($event.target as any).checked)" :checked="getRootN(index)"  class="inputSpacing">
       </template>
       <br>
-      音程跨度:
-      <template v-for="index in 21">
-        {{ getIntervalName(index) }}<input type="checkbox" @change="setIntervalOn(index,($event.target as any).checked)" :checked="getIntervalOn(index)" class="inputSpacing">
-      </template>
+
  
     </div>
     <div style="padding:4px;margin-top:10px;border:1px dashed #000000;display:inline-block;">

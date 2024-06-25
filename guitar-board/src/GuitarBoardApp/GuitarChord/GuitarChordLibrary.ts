@@ -64,6 +64,9 @@ export default class GuitarChordLibrary {
         if(options.chord_m7 != null && !options.chord_m7) {
             chords = chords.filter((chord)=>!chord.isChord_m7);
         }
+        if(options.chord_m7b5 != null && !options.chord_m7b5) {
+            chords = chords.filter((chord)=>!chord.isChord_m7b5);
+        }
         if(options.chord_7 != null && !options.chord_7) {
             chords = chords.filter((chord)=>!chord.isChord_7);
         }
@@ -83,7 +86,7 @@ export default class GuitarChordLibrary {
             chords = chords.filter((chord)=>{if(chord.rootNote==null){return false;}return chord.rootNote.index < max;});
         }
         if(options.intervals != null) {
-            chords = chords.filter((chord)=>{if(options.intervals==null)return true;return options.intervals.indexOf(chord.interval)>=0;});
+            chords = chords.filter((chord)=>{if(options.intervals==null || chord.notes.length != 2)return true;return options.intervals.indexOf(chord.interval)>=0;});
         }
         return chords;
     }
@@ -124,19 +127,28 @@ export default class GuitarChordLibrary {
                 }
             }
             chord.name = newname;
+            let str = 0;
             for(let j = 0 ; j < chordObj.notes.length; ++j) {
               let ch = chordObj.notes[j];
               if(ch == 'x') {
+                str++;
+                continue;
+              }
+              if(ch == '_') {
+                if(chord.notes.length > 0) {
+                    chord.notes[chord.notes.length-1].length++;
+                }
                 continue;
               }
               let loc = new Location();
-              loc.str = 5-j;
+              loc.str = 5-str;
               if(ch.charCodeAt(0) > 60) {
                 loc.index = ch.charCodeAt(0) - 96 + 9 + s;
               } else {
                 loc.index = parseInt(ch) + s;
               }
               chord.notes.push(loc);
+              str++;
             }
   
             if(namePattern == null || namePattern.test(chord.name)){
@@ -393,52 +405,51 @@ export default class GuitarChordLibrary {
         },
         {
             name: "G",
-            slide: 11,
+            slide: 0,
             root: 5,
-            notes: "320003"
+            notes: "320__003"
         },
         {
             name: "E",
             slide: 12,
             root: 5,
-            notes: "022100"
-        },
-        {
-            name: "Gm",
-            slide: 11,
-            root: 5,
-            notes: "3100x3"
+            notes: "0_____2_2100"
         },
         {
             name: "Em",
             slide: 12,
             root: 5,
-            notes: "022000"
+            notes: "0_____22000"
         },
         {
             name: "Gsus2",
-            slideFrom: -1,
-            slide: 12,
+            slide: 0,
             root: 5,
-            notes: "3xx233"
+            notes: "300033"
         },
         {
             name: "Gsus4",
-            slide: 11,
+            slide: 0,
             root: 5,
-            notes: "33xx13"
+            notes: "330013"
+        },
+        {
+            name: "Gsus4",
+            slide: 0,
+            root: 5,
+            notes: "3_____5__5533"
         },
         {
             name: "Gdim",
-            slideFrom: -1,
-            slide: 10,
+            slideFrom: -2,
+            slide: 11,
             root: 5,
             notes: "3x532"
         },
         {
             name: "Gaug",
-            slideFrom: -2,
-            slide: 11,
+            slideFrom: -3,
+            slide: 12,
             root: 5,
             notes: "3x544"
         },
