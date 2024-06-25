@@ -37,27 +37,40 @@ export default class GuitarChordLibrary {
         if(options.natural != null && options.natural) {
             chords = chords.filter((chord)=>chord.isNatural);
         }
-        if(options.chord2 != null && !options.chord2) {
-            chords = chords.filter((chord)=>!chord.isChord2);
+        if(options.chord_2 != null && !options.chord_2) {
+            chords = chords.filter((chord)=>!chord.isChord_2);
         }
-        if(options.chord3 != null && !options.chord3) {
-            chords = chords.filter((chord)=>!chord.isChord3);
+        if(options.chord_3 != null && !options.chord_3) {
+            chords = chords.filter((chord)=>!chord.isChord_3);
         }
-        if(options.chord7 != null && !options.chord7) {
-            chords = chords.filter((chord)=>!chord.isChord7);
+        if(options.chord_m3 != null && !options.chord_m3) {
+            chords = chords.filter((chord)=>!chord.isChord_m3);
         }
-        if(options.sus != null && !options.sus) {
-            chords = chords.filter((chord)=>!chord.isSus);
+        if(options.chord_aug3 != null && !options.chord_aug3) {
+            chords = chords.filter((chord)=>!chord.isChord_aug3);
         }
-        if(options.aug != null && !options.aug) {
-            chords = chords.filter((chord)=>!chord.isAug);
+        if(options.chord_dim3 != null && !options.chord_dim3) {
+            chords = chords.filter((chord)=>!chord.isChord_dim3);
         }
-        if(options.dim != null && !options.dim) {
-            chords = chords.filter((chord)=>!chord.isDim);
+        if(options.chord_sus2 != null && !options.chord_sus2) {
+            chords = chords.filter((chord)=>!chord.isChord_sus2);
         }
-        if(options.transform != null && !options.transform) {
-            chords = chords.filter((chord)=>!chord.isTransform);
+        if(options.chord_sus4 != null && !options.chord_sus4) {
+            chords = chords.filter((chord)=>!chord.isChord_sus4);
         }
+        if(options.chord_maj7 != null && !options.chord_maj7) {
+            chords = chords.filter((chord)=>!chord.isChord_maj7);
+        }
+        if(options.chord_m7 != null && !options.chord_m7) {
+            chords = chords.filter((chord)=>!chord.isChord_m7);
+        }
+        if(options.chord_7 != null && !options.chord_7) {
+            chords = chords.filter((chord)=>!chord.isChord_7);
+        }
+        if(options.chord_mM7 != null && !options.chord_mM7) {
+            chords = chords.filter((chord)=>!chord.isChord_mM7);
+        }
+        
         if(options.roots != null) {
             chords = chords.filter((chord)=>{if(options.roots==null)return true;return options.roots.indexOf(chord.root)>=0;});
         }

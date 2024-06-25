@@ -19,13 +19,22 @@
         <option value="11">B</option>
       </select>
       顺阶和弦:<input type="checkbox" v-model.boolean="chordOptions.natural" class="inputSpacing">
-      音程:<input type="checkbox" v-model.boolean="chordOptions.chord2" class="inputSpacing">
-      三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord3" class="inputSpacing">
-      七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord7" class="inputSpacing">
-      挂留和弦:<input type="checkbox" v-model.boolean="chordOptions.sus" class="inputSpacing">
-      增和弦:<input type="checkbox" v-model.boolean="chordOptions.aug" class="inputSpacing">
-      减和弦:<input type="checkbox" v-model.boolean="chordOptions.dim" class="inputSpacing">
-      转位和弦:<input type="checkbox" v-model.boolean="chordOptions.transform" class="inputSpacing"><br>
+      音程:<input type="checkbox" v-model.boolean="chordOptions.chord_2" class="inputSpacing">
+      大三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_3" class="inputSpacing">
+      小三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m3" class="inputSpacing">
+      增三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_aug3" class="inputSpacing">
+      减三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_dim3" class="inputSpacing">
+      挂二和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_sus2" class="inputSpacing">
+      挂四和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_sus4" class="inputSpacing">
+      大七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_maj7" class="inputSpacing">
+      小七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m7" class="inputSpacing">
+      属七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_7" class="inputSpacing">
+      小大七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_mM7" class="inputSpacing">
+      半减七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m7b5" class="inputSpacing">
+      减七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_dim7" class="inputSpacing">
+
+      <br>
+
       根音最低品:<input type="range" v-model.number="chordOptions.rootMin" min="0" max="12" step="1" ><div style="display: inline-block;" class="inputSpacing">{{ chordOptions.rootMin }}</div>
       根音最高品:<input type="range" v-model.number="chordOptions.rootMax" min="3" max="15" step="1">{{ chordOptions.rootMax }}
       <template v-for="index in [5,4,3,2,1]">
@@ -94,21 +103,7 @@ import Instrument from '../GuitarPlayer/Instrument';
 
     selectedChord : Chord | null = null;
 
-    chordOptions : GuitarChordSearchOptions = {
-      baseTone: Tone.C,
-      natural: false,
-      chord2:true,
-      chord3:false,
-      chord7:false,
-      sus:false,
-      aug:false,
-      dim:false,
-      transform:false,
-      roots:[5],
-      rootMin:0,
-      rootMax:15,
-      intervals:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
-    }
+    chordOptions : GuitarChordSearchOptions = new GuitarChordSearchOptions();
 
     private getIntervalName(interval:number) {
       switch(interval){
