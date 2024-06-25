@@ -212,7 +212,7 @@ export default class GuitarPlayer {
     }
     public async playNote(string:number,index:number) {
         if(this.audioData == null) {
-            await this.changeInstrument(Instrument.Piano);
+            await this.changeInstrument(Instrument.Guitar);
         }
 
         let sampleNotes = [];

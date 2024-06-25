@@ -13,6 +13,7 @@ class GuitarChordSearchOptions {
     roots:number[] = [1,2,3,4,5]; // 指定根音在哪些弦
     rootMin?:number; // 根音的最小品
     rootMax?:number;  // 根音的最大品
+    intervals:number[] = [1,2,3,4,5,6,7,8,9,10,11,12]; // 最低音到最高音的音程音数(半音为一个音数)
 }
 
 export default GuitarChordSearchOptions;

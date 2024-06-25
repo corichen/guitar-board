@@ -99,6 +99,43 @@ class Chord {
         return this.name.indexOf("dim") > 0;
     }
 
+    public get interval() {
+        let minInterval = null;
+        let maxInterval = null;
+        for(let i = 0 ; i < this.notes.length; ++i) {
+            let interval = this.getNoteInterval(this.notes[i].str,this.notes[i].index);
+            if(minInterval == null || interval < minInterval) {
+                minInterval = interval;
+            }
+            if(maxInterval == null || interval > maxInterval) {
+                maxInterval = interval;
+            }
+        }
+        if(minInterval == null || maxInterval == null) {
+            return 0;
+        }
+        return maxInterval - minInterval;
+    }
+
+    public getNoteInterval(str:number,index:number) {
+        if(str==5) {
+            return index - 8;
+        }
+        if(str==4) {
+            return index - 3;
+        }
+        if(str==3) {
+            return index + 2;
+        }
+        if(str==2) {
+            return index + 7;
+        }
+        if(str==1) {
+            return index + 11;
+        }
+        return index + 16;
+    }
+
     public get levelInTone() {
         let toneIndex = 0;
         if(this.tone != null) {

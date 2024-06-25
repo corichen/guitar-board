@@ -69,6 +69,9 @@ export default class GuitarChordLibrary {
             let max = options.rootMax;
             chords = chords.filter((chord)=>{if(chord.rootNote==null){return false;}return chord.rootNote.index < max;});
         }
+        if(options.intervals != null) {
+            chords = chords.filter((chord)=>{if(options.intervals==null)return true;return options.intervals.indexOf(chord.interval)>=0;});
+        }
         return chords;
     }
 

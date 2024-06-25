@@ -28,15 +28,17 @@
       转位和弦:<input type="checkbox" v-model.boolean="chordOptions.transform" class="inputSpacing"><br>
       根音最低品:<input type="range" v-model.number="chordOptions.rootMin" min="0" max="12" step="1" ><div style="display: inline-block;" class="inputSpacing">{{ chordOptions.rootMin }}</div>
       根音最高品:<input type="range" v-model.number="chordOptions.rootMax" min="3" max="15" step="1">{{ chordOptions.rootMax }}
-      根音在6弦:<input type="checkbox" v-model.boolean="root5" class="inputSpacing">
-      根音在5弦:<input type="checkbox" v-model.boolean="root4" class="inputSpacing">
-      根音在4弦:<input type="checkbox" v-model.boolean="root3" class="inputSpacing">
-      根音在3弦:<input type="checkbox" v-model.boolean="root2" class="inputSpacing">
-      根音在2弦:<input type="checkbox" v-model.boolean="root1" class="inputSpacing">
+      <template v-for="index in [5,4,3,2,1]">
+        根音在{{ index+1 }}弦:<input type="checkbox" @change="setRootN(index,($event.target as any).checked)" :checked="getRootN(index)"  class="inputSpacing">
+      </template>
+      <br>
+      音程跨度:
+      <template v-for="index in 21">
+        {{ getIntervalName(index) }}<input type="checkbox" @change="setIntervalOn(index,($event.target as any).checked)" :checked="getIntervalOn(index)" class="inputSpacing">
+      </template>
+ 
     </div>
     <div style="padding:4px;margin-top:10px;border:1px dashed #000000;display:inline-block;">
-      乐器:<input v-model.number="playDelay" type="radio" name="instrument" :value="1">钢琴 <input v-model.number="playDelay" type="radio" name="instrument" :value="2">吉他 <br>
-
       弹奏模式:<input v-model.number="playDelay" type="radio" name="playMode" :value="0">扫弦 <input v-model.number="playDelay" type="radio" name="playMode" :value="200">分解 <br>
     </div><br>
     <GuitarBoardView ref="guitarBoradView"></GuitarBoardView>
@@ -85,10 +87,8 @@ import Instrument from '../GuitarPlayer/Instrument';
       }
     }
   })
-  export default class GuitarChordPracticeView extends Vue {
+  export default class GuitarChordSearchView extends Vue {
     
-
-    _instrument : Instrument = Instrument.Guitar;
 
     chords : Chord[] = [];
 
@@ -106,56 +106,54 @@ import Instrument from '../GuitarPlayer/Instrument';
       transform:false,
       roots:[5],
       rootMin:0,
-      rootMax:15
+      rootMax:15,
+      intervals:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
     }
 
-    set instrument(instrument:Instrument) {
-      this._instrument = instrument;
-      this.guitarPlayer.changeInstrument(instrument);
+    private getIntervalName(interval:number) {
+      switch(interval){
+        case 1:return "小二度";
+        case 2:return "大二度";
+        case 3:return "小三度";
+        case 4:return "大三度";
+        case 5:return "纯四度";
+        case 6:return "增四度";
+        case 7:return "纯五度";
+        case 8:return "小六度";
+        case 9:return "大六度";
+        case 10:return "小七度";
+        case 11:return "大七度";
+        case 12:return "纯八度";
+        case 13:return "小九度";
+        case 14:return "大九度";
+        case 15:return "小十度";
+        case 16:return "大十度";
+        case 17:return "纯十一度";
+        case 18:return "增十一度";
+        case 19:return "纯十二度";
+        case 20:return "小十三度";
+        case 21:return "大十三度";
+      }
+      return "未知音程";
     }
 
-    get instrument() {
-      return this._instrument;
+    private setIntervalOn(interval:number,on:boolean) {
+      let oldValue = this.getIntervalOn(interval);
+      if(oldValue == on) {
+        return;
+      }
+      if(on) {
+        this.chordOptions.intervals.push(interval);
+      } else {
+        let index = this.chordOptions.intervals.indexOf(interval);
+        if(index >= 0) {
+          this.chordOptions.intervals.splice(index,1);
+        }
+      }
     }
 
-    get root5(){
-      return this.getRootN(5);
-    }
-
-    set root5(root) {
-      this.setRootN(5,root);
-    }
-
-    get root4(){
-      return this.getRootN(4);
-    }
-
-    set root4(root) {
-      this.setRootN(4,root);
-    }
-
-    get root3(){
-      return this.getRootN(3);
-    }
-
-    set root3(root) {
-      this.setRootN(3,root);
-    }
-
-    get root2(){
-      return this.getRootN(2);
-    }
-
-    set root2(root) {
-      this.setRootN(2,root);
-    }
-
-    get root1(){
-      return this.getRootN(1);
-    }
-
-    set root1(root) {
-      this.setRootN(1,root);
+    private getIntervalOn(interval:number) {
+      return this.chordOptions.intervals.indexOf(interval) >= 0;
     }
 
     private setRootN(n:number,root:boolean) {

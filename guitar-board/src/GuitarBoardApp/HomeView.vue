@@ -1,18 +1,18 @@
 <template>
   <div class="home">
-    <GuitarChordPracticeView></GuitarChordPracticeView>
+    <GuitarChordSearchView></GuitarChordSearchView>
     <!-- <NotePractice></NotePractice> -->
   </div>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import GuitarChordPracticeView from './GuitarChordPractice/GuitarChordPracticeView.vue';
+import GuitarChordSearchView from './GuitarChordPractice/GuitarChordSearchView.vue';
 import NotePractice from './NotePractice/NotePractice.vue';
 
 @Options({
   components: {
-    GuitarChordPracticeView,
+    GuitarChordSearchView: GuitarChordSearchView,
     NotePractice
   },
 })
