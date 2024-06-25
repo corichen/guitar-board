@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="user-select: none;">
     <div>
       <svg @contextmenu.prevent="onRightClick" @click="onClick" :width="width" :height="height">
         <g :transform="'translate('+marginLeft+','+marginTop+')'">
