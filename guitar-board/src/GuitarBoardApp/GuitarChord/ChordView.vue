@@ -21,6 +21,14 @@
         </g>
         <text :x="width/2" :y="height-12" :fill="'#000'" font-weight="bold" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">{{ chordProp.name }}</text>
         <text v-if="baseIndex!=1" :x="marginLeft-5" :y="marginTop+cellHeight/2" :fill="'#000'" font-size="11" font-weight="bold" style="dominant-baseline: middle; text-anchor: end; pointer-events: none;">{{ baseIndex }}</text>
+        
+        <g v-if="chordProp.slideable" :transform="'translate('+(marginLeft-8)+','+(marginTop+20)+')'">
+          <line x1="-3" y1="5" x2="0" y2="0" stroke="#000" stroke-width="1"/>
+          <line x1="3" y1="5" x2="0" y2="0" stroke="#000" stroke-width="1"/>
+          <line x1="-3" y1="8" x2="0" y2="13" stroke="#000" stroke-width="1"/>
+          <line x1="3" y1="8" x2="0" y2="13" stroke="#000" stroke-width="1"/>
+        </g>
+     
       </svg>
     </div>
   </div>

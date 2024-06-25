@@ -110,6 +110,7 @@ export default class GuitarChordLibrary {
           
           for(let s = slideFrom ; s < slideCount + slideFrom; ++s){
             let chord = new Chord();
+            chord.slideable = slideCount > 1;
             chord.root = chordObj.root;
             let newname = "";
             for(let k = 0 ; k < chordObj.name.length; ++k) {

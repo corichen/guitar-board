@@ -4,6 +4,7 @@ import Location from "../GuitarPlayer/Location";
 class Chord {
     public name:string = "";
     public notes:Location[] = [];
+    public slideable: boolean = false;
     public root:number = 4; // 根音所在的弦(0-5)
     public tone:Tone|null = null;
     public get rootNote() {
