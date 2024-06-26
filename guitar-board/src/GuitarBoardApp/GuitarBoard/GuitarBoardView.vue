@@ -1,34 +1,44 @@
 <template>
   <div style="user-select: none;" :style="{position:'relative',width:(width+marginLeft*2)+'px',height:(height+marginTop*2)+'px'}">
-    <svg :width="width+marginLeft*2" :height="height+marginTop*2" style="border: #888 dashed 1px;position:absolute;">
+    <svg :width="width+marginLeft*2" :height="height+marginTop*2">
       <defs>
-        <linearGradient id="Gradient">
-          <stop offset="0%" stop-color="#444" />
-          <stop offset="100%" stop-color="#fff" />
-        </linearGradient>
+        <pattern id="stringbg3" x="0" y="0" :width="3/width" height="1">
+          <image :href="require('./assets/string-1-h.png')" x="0" y="0" width="3" height="3" preserveAspectRatio="none"></image>
+        </pattern>
+        <pattern id="stringbg4" x="0" y="0" :width="4/width" height="1">
+          <image :href="require('./assets/string-2-h.png')" x="0" y="0" width="4" height="4" preserveAspectRatio="none"></image>
+        </pattern>
+        <pattern id="stringbg6" x="0" y="0" :width="6/width" height="1">
+          <image :href="require('./assets/string-3-h.png')" x="0" y="0" width="6" height="6" preserveAspectRatio="none"></image>
+        </pattern>
+        <pattern id="fret" x="0" y="0" width="1" :height="1/(cellHeight*6)">
+          <image :href="require('./assets/fret-h.png')" x="0" y="0" width="7" height="1" preserveAspectRatio="none"></image>
+        </pattern>
       </defs>
       <g :transform="'translate('+marginLeft+','+marginTop+')'">
         <!-- guitar board background -->
         <g>
+          <rect x="0" :y="-cellHeight/2" :width="width" :height="height+cellHeight" fill="#333333"></rect>
+
           <!-- 3 5 7 9 12 -->
           <template v-for="index in [2,4,6,8,11]">
-            <rect :x="index*cellWidth" :y="0" :width="cellWidth" :height="cellHeight*5" :fill="fretHintBackgroundColor"></rect>
+            <rect :x="index*cellWidth" :y="-cellHeight/2" :width="cellWidth" :height="cellHeight*6" :fill="fretHintBackgroundColor"></rect>
           </template>
 
           <template v-for="index in [2,4,6,8]">
-            <circle :cx="index*cellWidth+cellWidth/2" :cy="cellHeight*2.5" :r="4" :fill="fretHintPointColor"></circle>
+            <circle :cx="index*cellWidth+cellWidth/2" :cy="cellHeight*2.5" :r="6" :fill="fretHintPointColor"></circle>
           </template>
 
           <template v-for="index in [1,5]">
-            <circle :cx="11*cellWidth+cellWidth/2" :cy="index*cellHeight-cellHeight/2" :r="4" :fill="fretHintPointColor"></circle>
+            <circle :cx="11*cellWidth+cellWidth/2" :cy="index*cellHeight-cellHeight/2" :r="6" :fill="fretHintPointColor"></circle>
           </template>
 
           <!-- frets -->
-          <rect v-for="index in 15" :x="(index-1)*cellWidth" :y="0" :height="cellHeight*5" width="2" :fill="fretColor"></rect>
+          <rect v-for="index in 14" :x="(index)*cellWidth" :y="-cellHeight/2" :height="cellHeight*5+cellHeight" width="7" fill="url(#fret)"></rect>
           <!-- strings -->
-          <line v-for="index in 6" :x1="0" :y1="(index-1)*cellHeight" :x2="width" :y2="(index-1)*cellHeight" stroke-width="2" :stroke="stringColor"></line>
+          <rect v-for="index in 6" :x="0" :y="(index-1)*cellHeight-getStringWidth(index-1)/2" :width="width" :height="getStringWidth(index-1)" :fill="'url(#stringbg'+getStringWidth(index-1)+')'" ></rect>
           <!-- header -->
-          <rect :x="-4" :y="-1" :width="4" :height="cellHeight*5+2" :stroke="stringColor" :fill="stringColor"></rect>
+          <rect :x="-4" :y="-cellHeight/2" :width="8" :height="cellHeight*6" :stroke="stringColor" :fill="stringColor"></rect>
         </g>
 
         <!-- notes -->
@@ -36,11 +46,11 @@
           <template v-for="(strObj,str) in this.strings">
             <template v-for="(note,index) in strObj">
               <g v-show="note.visible" @click="onNoteClicked(str,index)" :transform="'translate('+getNoteCenterX(str,index)+','+getNoteCenterY(str,index)+')'">
-                <circle cx="0" cy="0" :r="noteWidth/2" :fill="note.focus?'#07E':'#FFFFFF'" stroke="#888"></circle>
+                <circle cx="0" cy="0" :r="noteWidth/2" :fill="note.focus?'#ff8000':'#FFFFFF'" stroke="#333"></circle>
                 <g v-show="note.nameVisible">
-                  <text y="1" :fill="note.focus?'#FFF':'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">{{ getNoteSimpleName(str,index) }}</text> 
-                  <text v-show="isNoteUpper(str,index)" y="-2" x="-8" font-size="16" :fill="note.focus?'#FFF':'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">♯</text>
-                  <text v-show="isNoteLower(str,index)" y="-2" x="-8" font-size="16" :fill="note.focus?'#FFF':'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">♭</text>
+                  <text y="1" :fill="'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">{{ getNoteSimpleName(str,index) }}</text> 
+                  <text v-show="isNoteUpper(str,index)" y="-2" x="-8" font-size="16" :fill="'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">♯</text>
+                  <text v-show="isNoteLower(str,index)" y="-2" x="-8" font-size="16" :fill="'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">♭</text>
                 </g>
               </g>
             </template>
@@ -91,14 +101,14 @@ export default class GuitarBoardView extends Vue {
 
   private tone : Tone = Tone.C;
 
-  private cellWidth : number = 76;
-  private cellHeight : number = 40;
+  private cellWidth : number = 104;
+  private cellHeight : number = 36;
   private noteWidth : number = 28;
   private marginLeft : number = 40;
   private marginTop : number = 20;
   private fretColor : string = "#000";
-  private fretHintBackgroundColor : string = "#ddd";
-  private fretHintPointColor : string = "#000";
+  private fretHintBackgroundColor : string = "#ddd3";
+  private fretHintPointColor : string = "#fff";
   private stringColor : string = "#000";
 
   private static noteNames = ["C","#C","D","bE","E","F","#F","G","bA","A","bB","B"];
@@ -107,6 +117,17 @@ export default class GuitarBoardView extends Vue {
   private onNoteClicked(str:number,index:number) {
     this.guitarPlayer.playNote(str,index);
     this.$emit("note-click",new NoteEvent(str,index));
+  }
+
+
+  private getStringWidth(str:number) {
+    if(str <= 1) {
+      return 3;
+    }
+    if(str <= 3) {
+      return 4;
+    }
+    return 6;
   }
 
   public setNoteStyle(noteStyle:NoteStyle) {

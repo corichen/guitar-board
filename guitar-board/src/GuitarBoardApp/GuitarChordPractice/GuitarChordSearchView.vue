@@ -2,59 +2,113 @@
     <div style="white-space: nowrap;">
       <audio ref="rightAudio" :src="require('./assets/right.wav')" volume="0.3"></audio>
       <audio ref="wrongAudio" :src="require('./assets/wrong.wav')" volume="0.3"></audio>
-      <div >
-      选调:
-      <select v-model="chordOptions.baseTone" class="inputSpacing">
-        <option value="0">C</option>
-        <option value="1">#C</option>
-        <option value="2">D</option>
-        <option value="3">bE</option>
-        <option value="4">E</option>
-        <option value="5">F</option>
-        <option value="6">#F</option>
-        <option value="7">G</option>
-        <option value="8">bA</option>
-        <option value="9">A</option>
-        <option value="10">bB</option>
-        <option value="11">B</option>
-      </select>
-      顺阶和弦:<input type="checkbox" v-model.boolean="chordOptions.natural" class="inputSpacing">
-      音程:<input type="checkbox" v-model.boolean="chordOptions.chord_2" class="inputSpacing">
-      大三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_3" class="inputSpacing">
-      小三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m3" class="inputSpacing">
-      增三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_aug3" class="inputSpacing">
-      减三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_dim3" class="inputSpacing">
-      挂二和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_sus2" class="inputSpacing">
-      挂四和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_sus4" class="inputSpacing">
-      大七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_maj7" class="inputSpacing">
-      小七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m7" class="inputSpacing">
-      属七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_7" class="inputSpacing">
-      小大七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_mM7" class="inputSpacing">
-      半减七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m7b5" class="inputSpacing">
-      减七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_dim7" class="inputSpacing">
 
-      <br>
-      <template v-if="chordOptions.chord_2">
-      音程:
-      <template v-for="index in 21">
-        {{ getIntervalName(index) }}<input type="checkbox" @change="setIntervalOn(index,($event.target as any).checked)" :checked="getIntervalOn(index)" class="inputSpacing">
-      </template>
-      <br>
-    </template>
+      <div style="border-radius: 4px; background-color: #333;display:inline-block;padding:6px 10px;">
+      <div @click="optionsVisible=!optionsVisible" style="display: flex; flex-direction: row;align-items: center;color:white;">
+        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+          width="17px" height="17px" viewBox="0 0 17 17" enable-background="new 0 0 17 17" xml:space="preserve">
+        <path id="Path_2" fill="#fff" d="M16.4,7.37l-1.8-0.26c-0.16-0.69-0.43-1.35-0.81-1.95l1.09-1.46c0.2-0.27,0.18-0.66-0.07-0.9
+          l-0.63-0.63c-0.24-0.24-0.63-0.27-0.9-0.06L11.84,3.2c-0.6-0.38-1.26-0.65-1.95-0.81l-0.26-1.8C9.58,0.25,9.28,0,8.94,0H8.06
+          C7.71,0,7.42,0.25,7.37,0.59l-0.26,1.8C6.42,2.55,5.76,2.82,5.16,3.2L3.7,2.11c-0.27-0.2-0.66-0.18-0.9,0.06L2.18,2.8
+          C1.93,3.05,1.91,3.43,2.11,3.7L3.2,5.16c-0.38,0.6-0.65,1.26-0.81,1.95l-1.8,0.26C0.25,7.42,0,7.71,0,8.06v0.88
+          c0,0.34,0.25,0.64,0.59,0.68l1.8,0.26c0.16,0.69,0.43,1.35,0.81,1.95l-1.09,1.46c-0.2,0.27-0.18,0.66,0.07,0.9l0.63,0.63
+          c0.24,0.24,0.63,0.27,0.9,0.07l1.46-1.09c0.6,0.38,1.26,0.65,1.95,0.81l0.26,1.8C7.42,16.75,7.71,17,8.06,17h0.88
+          c0.34,0,0.64-0.25,0.68-0.59l0.26-1.8c0.69-0.16,1.35-0.43,1.95-0.81l1.46,1.09c0.27,0.2,0.66,0.18,0.9-0.07l0.63-0.63
+          c0.24-0.24,0.27-0.63,0.07-0.9l-1.09-1.46c0.38-0.6,0.65-1.26,0.81-1.95l1.8-0.26C16.74,9.58,17,9.28,17,8.94V8.06
+          C17,7.71,16.74,7.42,16.4,7.37z M8.5,12.38c-2.14,0-3.88-1.74-3.88-3.88c0-2.14,1.74-3.88,3.88-3.88c2.14,0,3.88,1.74,3.88,3.88
+          C12.38,10.64,10.64,12.38,8.5,12.38L8.5,12.38z"/>
+        </svg>
+        <div style="margin-left: 6px;">
+          选项
+        </div>
+      </div>
+     
 
-      根音最低品:<input type="range" v-model.number="chordOptions.rootMin" min="0" max="12" step="1" ><div style="display: inline-block;" class="inputSpacing">{{ chordOptions.rootMin }}</div>
-      根音最高品:<input type="range" v-model.number="chordOptions.rootMax" min="3" max="15" step="1">{{ chordOptions.rootMax }}
-      <template v-for="index in [5,4,3,2,1]">
-        根音在{{ index+1 }}弦:<input type="checkbox" @change="setRootN(index,($event.target as any).checked)" :checked="getRootN(index)"  class="inputSpacing">
-      </template>
-      <br>
+      </div>
+      <div v-if="optionsVisible">
 
- 
+        <table>
+          <tr>
+            <td style="font-weight: bold;">首调</td>
+            <td>
+              <select v-model="chordOptions.baseTone" class="inputSpacing">
+                <option value="0">C</option>
+                <option value="1">#C</option>
+                <option value="2">D</option>
+                <option value="3">bE</option>
+                <option value="4">E</option>
+                <option value="5">F</option>
+                <option value="6">#F</option>
+                <option value="7">G</option>
+                <option value="8">bA</option>
+                <option value="9">A</option>
+                <option value="10">bB</option>
+                <option value="11">B</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">顺接和弦</td>
+            <td>
+              <input type="checkbox" v-model.boolean="chordOptions.natural" class="inputSpacing"> <br>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">和弦类型</td>
+            <td>
+              音程:<input type="checkbox" v-model.boolean="chordOptions.chord_2" class="inputSpacing">
+              大三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_3" class="inputSpacing">
+              小三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m3" class="inputSpacing">
+              增三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_aug3" class="inputSpacing">
+              减三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_dim3" class="inputSpacing">
+              挂二和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_sus2" class="inputSpacing">
+              挂四和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_sus4" class="inputSpacing">
+              大七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_maj7" class="inputSpacing">
+              小七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m7" class="inputSpacing">
+              属七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_7" class="inputSpacing">
+              小大七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_mM7" class="inputSpacing">
+              半减七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m7b5" class="inputSpacing">
+              减七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_dim7" class="inputSpacing">
+            </td>
+          </tr>
+          <tr v-if="chordOptions.chord_2">
+            <td style="font-weight: bold;">
+              音程:
+            </td>
+            <td>
+              <template v-for="index in 21">
+                {{ getIntervalName(index) }}<input type="checkbox" @change="setIntervalOn(index,($event.target as any).checked)" :checked="getIntervalOn(index)" class="inputSpacing">
+              </template>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">
+            根音范围
+            </td>
+            <td>
+              最低品:<input type="range" v-model.number="chordOptions.rootMin" min="0" max="12" step="1" ><div style="display: inline-block;" class="inputSpacing">{{ chordOptions.rootMin }}</div>
+              最高品:<input type="range" v-model.number="chordOptions.rootMax" min="3" max="15" step="1">{{ chordOptions.rootMax }}
+              <template v-for="index in [5,4,3,2,1]">
+                根音在{{ index+1 }}弦:<input type="checkbox" @change="setRootN(index,($event.target as any).checked)" :checked="getRootN(index)"  class="inputSpacing">
+              </template>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">弹奏模式</td>
+            <td>
+              <input v-model.number="playDelay" type="radio" name="playMode" :value="10">扫弦 <input v-model.number="playDelay" type="radio" name="playMode" :value="200">分解
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">显示指板音</td>
+            <td>
+              <input v-model.boolean="this.naturalNotesVisible" type="checkbox">
+            </td>
+          </tr>
+        </table> 
     </div>
-    <div style="padding:4px;margin-top:10px;border:1px dashed #000000;display:inline-block;">
-      弹奏模式:<input v-model.number="playDelay" type="radio" name="playMode" :value="0">扫弦 <input v-model.number="playDelay" type="radio" name="playMode" :value="200">分解 <br>
-    </div><br>
-    <GuitarBoardView ref="guitarBoradView"></GuitarBoardView>
+    
+    <GuitarBoardView ref="guitarBoradView" style="margin-top: 10px;"></GuitarBoardView>
   
       <div style="margin-top: 10px;">
         <table>
@@ -97,11 +151,17 @@ import Instrument from '../GuitarPlayer/Instrument';
           this.loadChords();
         },
         deep:true
+      },
+      naturalNotesVisible(){
+        this.loadChords();
       }
     }
   })
   export default class GuitarChordSearchView extends Vue {
     
+    naturalNotesVisible:boolean = false;
+
+    optionsVisible:boolean = false;
 
     chords : Chord[] = [];
 
@@ -176,13 +236,15 @@ import Instrument from '../GuitarPlayer/Instrument';
 
     guitarPlayer : GuitarPlayer = new GuitarPlayer();
 
-    playDelay : number = 0;
+    playDelay : number = 10;
 
     public onChordClick(chord:Chord) {
       this.selectedChord = chord;
       this.guitarPlayer.playNotes(chord.notes,this.playDelay);
       this.guitarBoardView.setVisible(false);
-      this.guitarBoardView.setVisible(true,this.guitarBoardView.getNaturalNotes());
+      if(this.naturalNotesVisible){
+        this.guitarBoardView.setVisible(true,this.guitarBoardView.getNaturalNotes());
+      }
       this.guitarBoardView.setVisible(true,chord.notes);
       this.guitarBoardView.setFocus(false);
       this.guitarBoardView.setFocus(true,chord.notes);
@@ -193,7 +255,9 @@ import Instrument from '../GuitarPlayer/Instrument';
       this.chords = GuitarChordLibrary.searchNaturalToneChords(names[this.chordOptions.baseTone],this.chordOptions);
       this.guitarBoardView.setTone(this.chordOptions.baseTone);
       this.guitarBoardView.setVisible(false);
-      this.guitarBoardView.setVisible(true,this.guitarBoardView.getNaturalNotes());
+      if(this.naturalNotesVisible){
+        this.guitarBoardView.setVisible(true,this.guitarBoardView.getNaturalNotes());
+      }
       this.guitarBoardView.setFocus(false);
     }
 
