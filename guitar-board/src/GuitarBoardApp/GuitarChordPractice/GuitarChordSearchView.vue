@@ -179,7 +179,7 @@ import Instrument from '../GuitarPlayer/Instrument';
     
     naturalNotesVisible:boolean = false;
 
-    optionsVisible:boolean = true;
+    optionsVisible:boolean = false;
 
     chords : Chord[] = [];
 
@@ -264,8 +264,12 @@ import Instrument from '../GuitarPlayer/Instrument';
         this.guitarBoardView.setVisible(true,this.guitarBoardView.getNaturalNotes());
       }
       this.guitarBoardView.setVisible(true,chord.notes);
-      this.guitarBoardView.setFocus(false);
-      this.guitarBoardView.setFocus(true,chord.notes);
+      this.guitarBoardView.setFocus(0);
+      this.guitarBoardView.setFocus(1,chord.notes);
+      let rootNote = chord.rootNote;
+      if(rootNote != null) {
+        this.guitarBoardView.setFocus(2,[rootNote]);
+      }
     }
 
     private loadChords() {
@@ -276,7 +280,7 @@ import Instrument from '../GuitarPlayer/Instrument';
       if(this.naturalNotesVisible){
         this.guitarBoardView.setVisible(true,this.guitarBoardView.getNaturalNotes());
       }
-      this.guitarBoardView.setFocus(false);
+      this.guitarBoardView.setFocus(0);
     }
 
     get guitarBoardView() {

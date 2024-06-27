@@ -54,11 +54,11 @@
           <template v-for="(strObj,str) in this.strings">
             <template v-for="(note,index) in strObj">
               <g v-show="note.visible" @click="onNoteClicked(str,index)" :transform="'translate('+getNoteCenterX(str,index)+','+getNoteCenterY(str,index)+')'">
-                <circle cx="0" cy="0" :r="noteWidth/2" :fill="note.focus?'#ff8000':'#FFFFFF'" stroke="#333"></circle>
+                <circle cx="0" cy="0" :r="noteWidth/2" :fill="getNoteBackground(note)" stroke="#333"></circle>
                 <g v-show="note.nameVisible">
-                  <text y="1" :fill="'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">{{ getNoteSimpleName(str,index) }}</text> 
-                  <text v-show="isNoteUpper(str,index)" y="-2" x="-8" font-size="16" :fill="'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">♯</text>
-                  <text v-show="isNoteLower(str,index)" y="-2" x="-8" font-size="16" :fill="'#000'" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">♭</text>
+                  <text y="1" :fill="getNoteTextColor(note)" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">{{ getNoteSimpleName(str,index) }}</text> 
+                  <text v-show="isNoteUpper(str,index)" y="-2" x="-8" font-size="16" :fill="getNoteTextColor(note)" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">♯</text>
+                  <text v-show="isNoteLower(str,index)" y="-2" x="-8" font-size="16" :fill="getNoteTextColor(note)" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">♭</text>
                 </g>
               </g>
             </template>
@@ -87,7 +87,7 @@ class Note {
   // 是否展示名称
   public nameVisible : boolean = true;
   // 是否高亮
-  public focus : boolean = false;
+  public focus : number = 0; // 0 普通，1 一级聚焦，2 二级聚焦
   // 横按长度
   public length: number = 1;
 }
@@ -129,6 +129,25 @@ export default class GuitarBoardView extends Vue {
     this.$emit("note-click",new NoteEvent(str,index));
   }
 
+  private getNoteBackground(note:Note) {
+    if(note.focus == 0) {
+      return "#FFFFFF";
+    }
+    if(note.focus == 1) {
+      return '#ff8000'
+    }
+    return "#FF0000";
+  }
+
+  private getNoteTextColor(note:Note) {
+    if(note.focus == 0) {
+      return "#000";
+    }
+    if(note.focus == 1) {
+      return '#000'
+    }
+    return "#FFF";
+  }
 
   private getStringWidth(str:number) {
     if(str <= 1) {
@@ -156,7 +175,7 @@ export default class GuitarBoardView extends Vue {
     return this.tone;
   }
 
-  public setFocus(focus:boolean=true,locations:Location[]|null=null) {
+  public setFocus(focus:number=1,locations:Location[]|null=null) {
     if(locations == null) {
       for(let i = 0 ; i < this.strings.length ; ++i) {
         for(let j = 0 ; j < this.strings[i].length; ++j) {
@@ -207,7 +226,7 @@ export default class GuitarBoardView extends Vue {
   }
 
   public clearFocus() {
-    this.setFocus(false);
+    this.setFocus(0);
   }
 
   private getNoteSimpleName(str:number,index:number) : string {
