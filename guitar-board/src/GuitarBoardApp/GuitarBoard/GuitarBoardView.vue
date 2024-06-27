@@ -34,7 +34,7 @@
           </template>
 
           <!-- frets -->
-          <rect v-for="index in 14" :x="(index)*cellWidth" :y="-cellHeight/2" :height="cellHeight*5+cellHeight" width="7" fill="url(#fret)"></rect>
+          <rect v-for="index in 14" :x="(index)*cellWidth-3.5" :y="-cellHeight/2" :height="cellHeight*5+cellHeight" width="7" fill="url(#fret)"></rect>
           <!-- strings -->
           <rect v-for="index in 6" :x="0" :y="(index-1)*cellHeight-getStringWidth(index-1)/2" :width="width" :height="getStringWidth(index-1)" :fill="'url(#stringbg'+getStringWidth(index-1)+')'" ></rect>
           <!-- header -->
