@@ -43,6 +43,14 @@
 
         <!-- notes -->
         <g>
+          <!-- note length bg -->
+          <template v-for="(strObj,str) in this.strings">
+            <template v-for="(note,index) in strObj">
+              <g v-show="note.visible && note.length > 1" :transform="'translate('+getNoteCenterX(str,index)+','+getNoteCenterY(str,index)+')'">
+                <rect :x="-noteWidth/2" :y="-noteWidth/2-(note.length-1)*cellHeight" :width="noteWidth" :height="(note.length-1)*cellHeight+noteWidth" :rx="noteWidth/2" fill="#ff800088"/>
+              </g>
+            </template>
+          </template>
           <template v-for="(strObj,str) in this.strings">
             <template v-for="(note,index) in strObj">
               <g v-show="note.visible" @click="onNoteClicked(str,index)" :transform="'translate('+getNoteCenterX(str,index)+','+getNoteCenterY(str,index)+')'">
@@ -79,7 +87,9 @@ class Note {
   // 是否展示名称
   public nameVisible : boolean = true;
   // 是否高亮
-  public focus : boolean = false;                              
+  public focus : boolean = false;
+  // 横按长度
+  public length: number = 1;
 }
 
 
@@ -167,12 +177,14 @@ export default class GuitarBoardView extends Vue {
       for(let i = 0 ; i < this.strings.length ; ++i) {
         for(let j = 0 ; j < this.strings[i].length; ++j) {
           this.strings[i][j].visible = visible;
+          this.strings[i][j].length = 1;
         }
       }
       return;
     } else {
       for(let i = 0; i < locations.length; ++i) {
         this.strings[locations[i].str][locations[i].index].visible = visible;
+        this.strings[locations[i].str][locations[i].index].length = locations[i].length;
       }
       return;
     }
