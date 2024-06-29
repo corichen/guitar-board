@@ -137,6 +137,12 @@
                 <input v-model.boolean="this.naturalNotesVisible" type="checkbox">
               </td>
             </tr>
+            <tr>
+              <td class="setting_title">指板样式</td>
+              <td>
+                逻辑<input v-model.number="boardStyle" type="radio" name="boardStyle" :value="0"> 写实<input v-model.number="boardStyle" type="radio" name="boardStyle" :value="1">
+              </td>
+            </tr>
           </table> 
       </div>
       </div>
@@ -171,12 +177,17 @@ import Instrument from '../GuitarPlayer/Instrument';
         deep:true
       },
       naturalNotesVisible(){
-        this.loadChords();
+        this.updateNotes();
+      },
+      boardStyle() {
+        this.guitarBoardView.setStyle(this.boardStyle);
       }
     }
   })
   export default class GuitarChordSearchView extends Vue {
     
+    boardStyle : number = 0;
+
     naturalNotesVisible:boolean = false;
 
     optionsVisible:boolean = false;
@@ -259,28 +270,31 @@ import Instrument from '../GuitarPlayer/Instrument';
     public onChordClick(chord:Chord) {
       this.selectedChord = chord;
       this.guitarPlayer.playNotes(chord.notes,this.playDelay);
-      this.guitarBoardView.setVisible(false);
-      if(this.naturalNotesVisible){
-        this.guitarBoardView.setVisible(true,this.guitarBoardView.getNaturalNotes());
-      }
-      this.guitarBoardView.setVisible(true,chord.notes);
-      this.guitarBoardView.setFocus(0);
-      this.guitarBoardView.setFocus(1,chord.notes);
-      let rootNote = chord.rootNote;
-      if(rootNote != null) {
-        this.guitarBoardView.setFocus(2,[rootNote]);
-      }
+      this.updateNotes();
     }
 
     private loadChords() {
       let names = ["C","#C","D","bE","E","F","#F","G","bA","A","bB","B"];
       this.chords = GuitarChordLibrary.searchNaturalToneChords(names[this.chordOptions.baseTone],this.chordOptions);
       this.guitarBoardView.setTone(this.chordOptions.baseTone);
+      this.updateNotes();
+    }
+
+    private updateNotes() {
       this.guitarBoardView.setVisible(false);
+      this.guitarBoardView.setFocus(0);
+
       if(this.naturalNotesVisible){
         this.guitarBoardView.setVisible(true,this.guitarBoardView.getNaturalNotes());
       }
-      this.guitarBoardView.setFocus(0);
+      if(this.selectedChord != null) {
+        this.guitarBoardView.setVisible(true,this.selectedChord.notes);  
+        this.guitarBoardView.setFocus(1,this.selectedChord.notes);
+        let rootNote = this.selectedChord.rootNote;
+        if(rootNote != null) {
+          this.guitarBoardView.setFocus(2,[rootNote]);
+        }
+      }
     }
 
     get guitarBoardView() {
@@ -320,7 +334,7 @@ import Instrument from '../GuitarPlayer/Instrument';
   .button {}
 
   .button:hover {
-    background-color: #BBB;
+    background-color: #CCC;
   }
 
   </style>

@@ -417,10 +417,58 @@ export default class GuitarChordLibrary {
             notes: "0_____2_2100"
         },
         {
+            name: "C",
+            slide: 11,
+            root: 4,
+            notes: "x320__10"
+        },
+        {
+            name: "A",
+            slide: 9,
+            root: 4,
+            notes: "x0____2220"
+        },
+        {
+            name:"E",
+            slide:12,
+            root: 3,
+            notes:"xx2100"
+        },
+        {
+            name:"D",
+            slide:11,
+            root: 3,
+            notes:"xx0___232"
+        },
+        {
             name: "Em",
             slide: 12,
             root: 5,
             notes: "0_____22000"
+        },
+        {
+            name: "Gm",
+            slide: 11,
+            root: 5,
+            notes: "310_0"
+        },
+        {
+            name: "Am",
+            slide: 11,
+            root: 4,
+            notes: "x0____221"
+        },
+        {
+            name:"Em",
+            slide:12,
+            root: 3,
+            notes:"xx20__00"
+        },
+        {
+            name:"Dm",
+            slide:11,
+            root: 3,
+            notes:"xx0231"
         },
         {
             name: "Gsus2",
@@ -449,141 +497,12 @@ export default class GuitarChordLibrary {
         },
         {
             name: "Gaug",
-            slideFrom: -3,
-            slide: 12,
+            slideFrom: 0,
+            slide: 1,
             root: 5,
-            notes: "3x544"
+            notes: "321003"
         },
-        {
-            name: "Cmaj7",
-            slideFrom: -8,
-            slide: 12,
-            root: 5,
-            notes: "8a99"
-        },
-        {
-            name: "Cm7",
-            slideFrom: -8,
-            slide: 12,
-            root: 5,
-            notes: "8a88"
-        },
-        {
-            name: "C7",
-            slideFrom: -8,
-            slide: 12,
-            root: 5,
-            notes: "8a89"
-        },
-       
-        {
-            name: "Gm7b5",
-            slideFrom: -1,
-            slide: 12,
-            root: 5,
-            notes: "3xx321"
-        },
-
-
-        {
-            name: "C",
-            slide: 11,
-            root: 4,
-            notes: "x3201"
-        },
-        {
-            name: "A",
-            slide: 9,
-            root: 4,
-            notes: "x0222"
-        },
-        {
-            name: "Am",
-            slide: 11,
-            root: 4,
-            notes: "x0221"
-        },
-        {
-            name: "Csus2",
-            slide: 11,
-            root: 4,
-            notes: "x30033"
-        },
-        {
-            name: "Csus4",
-            slide: 11,
-            root: 4,
-            notes: "x33011"
-        },
-        {
-            name:"Caug",
-            slide: 11,
-            root: 4,
-            notes: "x3211"
-        },
-        {
-            name:"Cdim",
-            slide: 11,
-            root: 4,
-            notes: "x3454"
-        },
-        {
-            name: "Cmaj7",
-            slide: 11,
-            root: 4,
-            notes: "x3200"
-        },
-        {
-            name: "Cmaj7",
-            slideFrom: -3,
-            slide: 12,
-            root: 4,
-            notes: "x3545"
-        },
-        {
-            name: "Cm7",
-            slideFrom: -3,
-            slide: 12,
-            root: 4,
-            notes: "x3534"
-        },
-        {
-            name: "C7",
-            slide: 9,
-            root: 4,
-            notes: "x3535"
-        },
-        {
-            name: "Cm7b5",
-            slideFrom: -3,
-            slide: 13,
-            root: 4,
-            notes: "x3434"
-        },
-        {
-            name:"E",
-            slide:12,
-            root: 3,
-            notes:"xx2100"
-        },
-        {
-            name:"D",
-            slide:11,
-            root: 3,
-            notes:"xx0232"
-        },
-        {
-            name:"Em",
-            slide:12,
-            root: 3,
-            notes:"xx2000"
-        },
-        {
-            name:"Dm",
-            slide:11,
-            root: 3,
-            notes:"xx0231"
-        },
+      
         {
             name:"Dsus2",
             slide:11,
@@ -620,6 +539,97 @@ export default class GuitarChordLibrary {
             root: 2,
             notes: "x20033"
         },
+
+        {
+            name: "Csus2",
+            slide: 11,
+            root: 4,
+            notes: "x30033"
+        },
+        {
+            name: "Csus4",
+            slide: 11,
+            root: 4,
+            notes: "x33011"
+        },
+        {
+            name:"Caug",
+            slide: 11,
+            root: 4,
+            notes: "x3211"
+        },
+        {
+            name:"Cdim",
+            slide: 11,
+            root: 4,
+            notes: "x3454"
+        },
+        {
+            name: "Cmaj7",
+            slideFrom: -8,
+            slide: 12,
+            root: 5,
+            notes: "8a99"
+        },
+        {
+            name: "Cm7",
+            slideFrom: -8,
+            slide: 12,
+            root: 5,
+            notes: "8a88"
+        },
+        {
+            name: "C7",
+            slideFrom: -8,
+            slide: 12,
+            root: 5,
+            notes: "8a89"
+        },
+       
+        {
+            name: "Gm7b5",
+            slideFrom: -1,
+            slide: 12,
+            root: 5,
+            notes: "3xx321"
+        },
+
+
+       
+        {
+            name: "Cmaj7",
+            slide: 11,
+            root: 4,
+            notes: "x3200"
+        },
+        {
+            name: "Cmaj7",
+            slideFrom: -3,
+            slide: 12,
+            root: 4,
+            notes: "x3545"
+        },
+        {
+            name: "Cm7",
+            slideFrom: -3,
+            slide: 12,
+            root: 4,
+            notes: "x3534"
+        },
+        {
+            name: "C7",
+            slide: 9,
+            root: 4,
+            notes: "x3535"
+        },
+        {
+            name: "Cm7b5",
+            slideFrom: -3,
+            slide: 13,
+            root: 4,
+            notes: "x3434"
+        },
+       
         {
             name:"Fmaj7",
             slide: 11,

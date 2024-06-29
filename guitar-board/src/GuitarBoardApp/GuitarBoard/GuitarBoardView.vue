@@ -1,6 +1,6 @@
 <template>
-  <div style="user-select: none;" :style="{position:'relative',width:(width+marginLeft*2)+'px',height:(height+marginTop*2)+'px'}">
-    <svg :width="width+marginLeft*2" :height="height+marginTop*2">
+  <div style="user-select: none;" :style="{position:'relative',width:(width+style.marginLeft*2)+'px',height:(height+style.marginTop*2)+'px'}">
+    <svg :width="width+style.marginLeft*2" :height="height+style.marginTop*2">
       <defs>
         <pattern id="stringbg3" x="0" y="0" :width="3/width" height="1">
           <image :href="require('./assets/string-1-h.png')" x="0" y="0" width="3" height="3" preserveAspectRatio="none"></image>
@@ -11,34 +11,34 @@
         <pattern id="stringbg6" x="0" y="0" :width="6/width" height="1">
           <image :href="require('./assets/string-3-h.png')" x="0" y="0" width="6" height="6" preserveAspectRatio="none"></image>
         </pattern>
-        <pattern id="fret" x="0" y="0" width="1" :height="1/(cellHeight*6)">
+        <pattern id="fret" x="0" y="0" width="1" :height="1/(style.cellHeight*6)">
           <image :href="require('./assets/fret-h.png')" x="0" y="0" width="7" height="1" preserveAspectRatio="none"></image>
         </pattern>
       </defs>
-      <g :transform="'translate('+marginLeft+','+marginTop+')'">
+      <g :transform="'translate('+style.marginLeft+','+style.marginTop+')'">
         <!-- guitar board background -->
         <g>
-          <rect x="0" :y="-cellHeight/2" :width="width" :height="height+cellHeight" fill="#333333"></rect>
+          <rect x="0" :y="-style.cellHeight/2" :width="width" :height="height+style.cellHeight" :fill="style.backgroundColor"></rect>
 
           <!-- 3 5 7 9 12 -->
           <template v-for="index in [2,4,6,8,11]">
-            <rect :x="index*cellWidth" :y="-cellHeight/2" :width="cellWidth" :height="cellHeight*6" :fill="fretHintBackgroundColor"></rect>
+            <rect :x="index*style.cellWidth" :y="-style.paddingTop" :width="style.cellWidth" :height="style.cellHeight*5+(style.paddingTop+style.paddingBottom)" :fill="style.fretHintBackgroundColor"></rect>
           </template>
 
           <template v-for="index in [2,4,6,8]">
-            <circle :cx="index*cellWidth+cellWidth/2" :cy="cellHeight*2.5" :r="6" :fill="fretHintPointColor"></circle>
+            <circle :cx="index*style.cellWidth+style.cellWidth/2" :cy="style.cellHeight*2.5" :r="6" :fill="style.fretHintPointColor"></circle>
           </template>
 
           <template v-for="index in [1,5]">
-            <circle :cx="11*cellWidth+cellWidth/2" :cy="index*cellHeight-cellHeight/2" :r="6" :fill="fretHintPointColor"></circle>
+            <circle :cx="11*style.cellWidth+style.cellWidth/2" :cy="index*style.cellHeight-style.cellHeight/2" :r="6" :fill="style.fretHintPointColor"></circle>
           </template>
 
           <!-- frets -->
-          <rect v-for="index in 14" :x="(index)*cellWidth-3.5" :y="-cellHeight/2" :height="cellHeight*5+cellHeight" width="7" fill="url(#fret)"></rect>
+          <rect v-for="index in 14" :x="(index)*style.cellWidth-style.fretWidth/2" :y="-style.paddingTop" :height="style.cellHeight*5+(style.paddingTop+style.paddingBottom)" :width="style.fretWidth" :fill="style.fretColor"></rect>
           <!-- strings -->
-          <rect v-for="index in 6" :x="0" :y="(index-1)*cellHeight-getStringWidth(index-1)/2" :width="width" :height="getStringWidth(index-1)" :fill="'url(#stringbg'+getStringWidth(index-1)+')'" ></rect>
+          <rect v-for="index in 6" :x="0" :y="(index-1)*style.cellHeight-style.stringWidths[index-1]/2" :width="width" :height="style.stringWidths[index-1]" :fill="style.stringColors[index-1]" ></rect>
           <!-- header -->
-          <rect :x="-4" :y="-cellHeight/2" :width="8" :height="cellHeight*6" :stroke="stringColor" :fill="stringColor"></rect>
+          <rect :x="-4" :y="-style.paddingTop" :width="8" :height="style.cellHeight*5+(style.paddingTop+style.paddingBottom)" stroke="#000" fill="#000"></rect>
         </g>
 
         <!-- notes -->
@@ -47,14 +47,14 @@
           <template v-for="(strObj,str) in this.strings">
             <template v-for="(note,index) in strObj">
               <g v-show="note.visible && note.length > 1" :transform="'translate('+getNoteCenterX(str,index)+','+getNoteCenterY(str,index)+')'">
-                <rect :x="-noteWidth/2" :y="-noteWidth/2-(note.length-1)*cellHeight" :width="noteWidth" :height="(note.length-1)*cellHeight+noteWidth" :rx="noteWidth/2" fill="#ff800088"/>
+                <rect :x="-style.noteWidth/2" :y="-style.noteWidth/2-(note.length-1)*style.cellHeight" :width="style.noteWidth" :height="(note.length-1)*style.cellHeight+style.noteWidth" :rx="style.noteWidth/2" fill="#ff800088"/>
               </g>
             </template>
           </template>
           <template v-for="(strObj,str) in this.strings">
             <template v-for="(note,index) in strObj">
               <g v-show="note.visible" @click="onNoteClicked(str,index)" :transform="'translate('+getNoteCenterX(str,index)+','+getNoteCenterY(str,index)+')'">
-                <circle cx="0" cy="0" :r="noteWidth/2" :fill="getNoteBackground(note)" stroke="#333"></circle>
+                <circle cx="0" cy="0" :r="style.noteWidth/2" :fill="getNoteBackground(note)" stroke="#333"></circle>
                 <g v-show="note.nameVisible">
                   <text y="1" :fill="getNoteTextColor(note)" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">{{ getNoteSimpleName(str,index) }}</text> 
                   <text v-show="isNoteUpper(str,index)" y="-2" x="-8" font-size="16" :fill="getNoteTextColor(note)" style="dominant-baseline: middle; text-anchor: middle; pointer-events: none;">♯</text>
@@ -111,15 +111,49 @@ export default class GuitarBoardView extends Vue {
 
   private tone : Tone = Tone.C;
 
-  private cellWidth : number = 104;
-  private cellHeight : number = 36;
-  private noteWidth : number = 28;
-  private marginLeft : number = 40;
-  private marginTop : number = 20;
-  private fretColor : string = "#000";
-  private fretHintBackgroundColor : string = "#ddd3";
-  private fretHintPointColor : string = "#fff";
-  private stringColor : string = "#000";
+  public static STYLE_REAL = {
+    cellWidth : 104,
+    cellHeight : 36,
+    noteWidth : 28,
+    marginLeft : 40,
+    marginTop : 20,
+    paddingTop : 18,
+    paddingBottom : 18,
+    fretColor : "url(#fret)",
+    fretHintBackgroundColor : "#ddd3",
+    fretHintPointColor: "#fff",
+    backgroundColor: "#333333",
+    stringWidths : [3,3,4,4,6,6],
+    stringColors : ["url(#stringbg3)","url(#stringbg3)","url(#stringbg4)","url(#stringbg4)","url(#stringbg6)","url(#stringbg6)"],
+    fretWidth : 7
+  }
+
+  public static STYLE_LOGIC = {
+    cellWidth : 90,
+    cellHeight : 36,
+    noteWidth : 28,
+    marginLeft : 40,
+    marginTop : 20,
+    paddingTop : 0,
+    paddingBottom : 0,
+    fretColor : "#000",
+    fretHintBackgroundColor : "#0003",
+    fretHintPointColor: "#000",
+    backgroundColor: "#FFF",
+    stringWidths : [1,1,1,1,1,1],
+    stringColors : ["#000","#000","#000","#000","#000","#000"],
+    fretWidth : 1
+  }
+
+  private style = GuitarBoardView.STYLE_LOGIC;
+
+  public setStyle(style:number) {
+    if(style == 0) {
+      this.style = GuitarBoardView.STYLE_LOGIC;
+      return;
+    }
+    this.style = GuitarBoardView.STYLE_REAL;
+  }
 
   private static noteNames = ["C","#C","D","bE","E","F","#F","G","bA","A","bB","B"];
   private static numberNames = ["1","#1","2","b3","3","4","#4","5","b6","6","b7","7"];
@@ -147,16 +181,6 @@ export default class GuitarBoardView extends Vue {
       return '#000'
     }
     return "#FFF";
-  }
-
-  private getStringWidth(str:number) {
-    if(str <= 1) {
-      return 3;
-    }
-    if(str <= 3) {
-      return 4;
-    }
-    return 6;
   }
 
   public setNoteStyle(noteStyle:NoteStyle) {
@@ -301,21 +325,21 @@ export default class GuitarBoardView extends Vue {
 
   private getNoteCenterX(str:number,index:number) : number {
     if(index == 0) {
-      return -this.marginLeft / 2;
+      return -this.style.marginLeft / 2;
     }
-    return this.cellWidth * (index-0.5);
+    return this.style.cellWidth * (index-0.5);
   }
 
   private getNoteCenterY(str:number,index:number) : number {
-    return str * this.cellHeight;
+    return str * this.style.cellHeight;
   }
 
   private get width() {
-    return this.cellWidth * 14;
+    return this.style.cellWidth * 14;
   }
 
   private get height() {
-    return this.cellHeight * 5;
+    return this.style.cellHeight * 5;
   }
 
   mounted() {
