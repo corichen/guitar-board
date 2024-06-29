@@ -61,6 +61,16 @@ class Chord {
         return true;
     }
 
+    public isColor(color:string) {
+        if(color == "major") {
+            return /^(#|b)?[A-G](\/(#|b)?[A-G])?$/.test(this.name);
+        }
+        if(color == "minor") {
+            return /^(#|b)?[A-G]m(\/(#|b)?[A-G])?$/.test(this.name);
+        }
+        return new RegExp(`^(#|b)?[A-G]${color}(\/(#|b)?[A-G])?$`).test(this.name);
+    }
+
     public get isChord_2() {
         return this.notes.length == 2;
     }
@@ -147,6 +157,42 @@ class Chord {
             return 0;
         }
         return maxInterval - minInterval;
+    }
+
+    public static getIntervalName(interval:number) {
+        let number = 0;
+        let style = "";
+        let segCount = Math.floor(interval / 12);
+        switch(interval%12) {
+            case 0:style = "纯";number = 1;break;
+            case 1:style = "小";number = 2;break;
+            case 2:style = "大";number = 2;break;
+            case 3:style = "小";number = 3;break;
+            case 4:style = "大";number = 3;break;
+            case 5:style = "纯";number = 4;break;
+            case 6:style = "增";number = 4;break;
+            case 7:style = "纯";number = 5;break;
+            case 8:style = "小";number = 6;break;
+            case 9:style = "大";number = 6;break;
+            case 10:style = "小";number = 7;break;
+            case 11:style = "大";number = 7;break;
+            case 12:style = "纯";number = 8;break;
+        }
+        return style + Chord.number2Text(number+8*segCount-1) + "度";
+    }
+
+    // 只保证100以内正确
+    private static number2Text(number:number) {
+        let numberArr = ["零","一","二","三","四","五","六","七","八","九"];
+        let units = ["个","十","百"];
+        let text = "";
+        let numberText = number.toString();
+        for(let i = 0;i<numberText.length;i++) {
+            text += numberArr[parseInt(numberText[i])] + (i<numberText.length-1?units[numberText.length-1-i]:"") ;
+        }
+	    text = text.replace(/^一十/,"十");
+        text = text.replaceAll(/十零/g,"十");
+        return text;
     }
 
     public getNoteInterval(str:number,index:number) {

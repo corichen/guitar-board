@@ -1,5 +1,6 @@
 import Instrument from "./Instrument";
 import Location from "./Location";
+import Tone from "./Tone";
 
 export default class GuitarPlayer {
 
@@ -201,16 +202,44 @@ export default class GuitarPlayer {
             },time);
         });
     }
-    public async playNotes(notes:Location[],delay:number=0){
+    public async playNotes(notes:Location[],delay:number=0,duration:number|null=null){
         for(let i = 0 ; i < notes.length; ++i) {
             if(notes[i].str < 0 || notes[i].str > 5) {
                 continue;
             }
-            await this.playNote(notes[i].str,notes[i].index);
+            await this.playNote(notes[i].str,notes[i].index,duration);
             await this.wait(delay);
         }
     }
-    public async playNote(string:number,index:number) {
+    public static getToneNote(tone:Tone) : Location {
+        switch(tone) {
+            case Tone.sC:
+                return new Location(4,4);
+            case Tone.D:
+                return new Location(3,0);
+            case Tone.bE:
+                return new Location(3,1);
+            case Tone.E:
+                return new Location(3,2);
+            case Tone.F:
+                return new Location(3,3);
+            case Tone.sF:
+                return new Location(3,4);
+            case Tone.G:
+                return new Location(2,0);
+            case Tone.bA:
+                return new Location(2,1);
+            case Tone.A:
+                return new Location(2,2);
+            case Tone.bB:
+                return new Location(2,3);
+            case Tone.B:
+                return new Location(1,0);
+            default:
+                return new Location(4,3);
+        }
+    }
+    public async playNote(string:number,index:number,duration:number|null=null) {
         if(this.audioData == null) {
             await this.changeInstrument(Instrument.Guitar);
         }
@@ -250,6 +279,11 @@ export default class GuitarPlayer {
 
         gainNode.connect(this.audioContext.destination);
 
-        bufferSource.start(0,sampleNote.begin,sampleNote.end-sampleNote.begin);
+        if(duration == null) {
+            duration = sampleNote.end-sampleNote.begin;
+        }
+
+        bufferSource.start(0,sampleNote.begin,duration);
+
     }
 }
