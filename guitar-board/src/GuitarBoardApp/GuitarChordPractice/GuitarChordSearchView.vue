@@ -135,8 +135,14 @@
             </tr>
             <tr>
               <td class="setting_title">指板样式</td>
-              <td>
+              <td class="setting_row">
                 逻辑<input v-model.number="boardStyle" type="radio" name="boardStyle" :value="0"> 写实<input v-model.number="boardStyle" type="radio" name="boardStyle" :value="1">
+              </td>
+            </tr>
+            <tr>
+              <td class="setting_title">显示指法</td>
+              <td class="setting_row">
+                <input v-model.boolean="this.fingerVisible" type="checkbox">
               </td>
             </tr>
           </table> 
@@ -186,6 +192,9 @@ import Dialog from "./components/Dialog.vue";
       },
       boardStyle() {
         this.guitarBoardView.setStyle(this.boardStyle);
+      },
+      fingerVisible(newValue) {
+        this.guitarBoardView.setFingerVisible(newValue);
       }
     }
   })
@@ -196,6 +205,8 @@ import Dialog from "./components/Dialog.vue";
     boardStyle : number = 0;
 
     naturalNotesVisible:boolean = false;
+
+    fingerVisible: boolean = true;
 
     optionsVisible:boolean = false;
 

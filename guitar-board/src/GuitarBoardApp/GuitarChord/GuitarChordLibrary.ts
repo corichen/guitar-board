@@ -141,6 +141,12 @@ export default class GuitarChordLibrary {
                 }
                 continue;
               }
+              if(/[A-E]/.test(ch)) {
+                if(chord.notes.length > 0) {
+                    chord.notes[chord.notes.length-1].finger = ch.charCodeAt(0) - 'A'.charCodeAt(0);
+                }
+                continue;
+              }
               let loc = new Location();
               loc.str = 5-str;
               if(ch.charCodeAt(0) > 60) {
@@ -408,37 +414,37 @@ export default class GuitarChordLibrary {
             name: "G",
             slide: 0,
             root: 5,
-            notes: "320__003"
+            notes: "3D2C0003E"
         },
         {
             name: "E",
             slide: 12,
             root: 5,
-            notes: "0_____2_2100"
+            notes: "0B_____2D_2E1C00"
         },
         {
             name: "C",
             slide: 11,
             root: 4,
-            notes: "x320__10"
+            notes: "x3E2D0B__1C0"
         },
         {
             name: "A",
             slide: 9,
             root: 4,
-            notes: "x0____2220"
+            notes: "x0B____2C2D2E0"
         },
         {
             name:"E",
             slide:12,
             root: 3,
-            notes:"xx2100"
+            notes:"xx2D1C0_B0"
         },
         {
             name:"D",
             slide:11,
             root: 3,
-            notes:"xx0___232"
+            notes:"xx0B___2C3E2D"
         },
         {
             name: "Em",
