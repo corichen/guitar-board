@@ -234,6 +234,9 @@ export default class GuitarBoardView extends Vue {
       return;
     } else {
       for(let i = 0; i < locations.length; ++i) {
+        if(locations[i].index > this.strings[locations[i].str].length - 1) {
+          continue;
+        }
         this.strings[locations[i].str][locations[i].index].focus = focus;
       }
       return;
@@ -252,6 +255,9 @@ export default class GuitarBoardView extends Vue {
       return;
     } else {
       for(let i = 0; i < locations.length; ++i) {
+        if(locations[i].index > this.strings[locations[i].str].length - 1) {
+          continue;
+        }
         this.strings[locations[i].str][locations[i].index].visible = visible;
         this.strings[locations[i].str][locations[i].index].length = locations[i].length;
         this.strings[locations[i].str][locations[i].index].finger = locations[i].finger;
@@ -270,6 +276,9 @@ export default class GuitarBoardView extends Vue {
       return;
     } else {
       for(let i = 0; i < locations.length; ++i) {
+        if(locations[i].index > this.strings[locations[i].str].length - 1) {
+          continue;
+        }
         this.strings[locations[i].str][locations[i].index].nameVisible = visible;
       }
       return;

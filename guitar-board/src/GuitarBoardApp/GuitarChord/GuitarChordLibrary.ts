@@ -566,7 +566,8 @@ export default class GuitarChordLibrary {
         },
         {
             name:"Cdim",
-            slide: 11,
+            slideFrom: -3,
+            slide: 12,
             root: 4,
             notes: "x3454"
         },
