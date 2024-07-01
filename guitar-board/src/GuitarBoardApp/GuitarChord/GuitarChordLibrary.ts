@@ -22,7 +22,7 @@ export default class GuitarChordLibrary {
                 chords = chords.concat(this.searchChords(new RegExp("^"+names[(fromIndex+interval)%names.length]+".*$")));
             }
         }
-        
+
         chords.map((chord)=>{
             if(options.baseTone != null) {
                 chord.tone=options.baseTone;
@@ -72,7 +72,7 @@ export default class GuitarChordLibrary {
         }
         
         if(options.roots != null) {
-            chords = chords.filter((chord)=>{if(options.roots==null)return true;return options.roots.indexOf(chord.root)>=0;});
+            chords = chords.filter((chord)=>{if(options.roots==null)return true;return options.roots & (1<<chord.root);});
         }
         if(options.rootMin != null) {
             let min = options.rootMin;
@@ -83,7 +83,7 @@ export default class GuitarChordLibrary {
             chords = chords.filter((chord)=>{if(chord.rootNote==null){return false;}return chord.rootNote.index < max;});
         }
         if(options.intervals != null) {
-            chords = chords.filter((chord)=>{if(options.intervals==null || chord.notes.length != 2)return true;return options.intervals.indexOf(chord.interval)>=0;});
+            chords = chords.filter((chord)=>{if(options.intervals==null || chord.notes.length != 2)return true;return options.intervals & (1<<chord.interval);});
         }
         return chords;
     }

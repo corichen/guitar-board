@@ -152,7 +152,7 @@ class Chord {
             case 11:style = "大";number = 7;break;
             case 12:style = "纯";number = 8;break;
         }
-        return style + Chord.number2Text(number+8*segCount-1) + "度";
+        return style + Chord.number2Text(number+7*segCount) + "度";
     }
 
     // 只保证100以内正确

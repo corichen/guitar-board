@@ -24,11 +24,11 @@ class GuitarChordSearchOptions {
     chord_9sus4:boolean = false; // 属九挂四
     chord_69:boolean = false; // 六九和弦
     chord_m69:boolean = false; // 小六九和弦
-    roots:number[] = [5,4,3,2,1]; // 指定根音在哪些弦
+    roots:number = 0xFF; // 指定根音在哪些弦. 从右至左按位与或。
     rootMin:number = 0; // 根音的最小品
     rootMax:number = 15;  // 根音的最大品
     levels:number = 0xFFFF; // 按位于或。从右至左的12个比特位对应1至12个音数。例如1级的音数是1，#1级的音数是2, 2级的音数是3，以此类推
-    intervals:number[] = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]; // 最低音到最高音的音程音数(半音为一个音数)
+    intervals:number = 0xFFFF; // 最低音到最高音的音程音数(半音为一个音数)。从右至左，按位与或。
 }
 
 export default GuitarChordSearchOptions;

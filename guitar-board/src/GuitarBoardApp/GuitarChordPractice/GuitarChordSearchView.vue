@@ -257,41 +257,27 @@ import Dialog from "./components/Dialog.vue";
     }
 
     private setIntervalOn(interval:number,on:boolean) {
-      let oldValue = this.getIntervalOn(interval);
-      if(oldValue == on) {
-        return;
-      }
       if(on) {
-        this.chordOptions.intervals.push(interval);
+        this.chordOptions.intervals |= (1 << interval);
       } else {
-        let index = this.chordOptions.intervals.indexOf(interval);
-        if(index >= 0) {
-          this.chordOptions.intervals.splice(index,1);
-        }
+        this.chordOptions.intervals &= ~(1 << interval);
       }
     }
 
     private getIntervalOn(interval:number) {
-      return this.chordOptions.intervals.indexOf(interval) >= 0;
+      return this.chordOptions.intervals & (1<<interval);
     }
 
     private setRootN(n:number,root:boolean) {
-      let oldValue = this.getRootN(n);
-      if(oldValue == root) {
-        return;
-      }
-      if(root) {
-        this.chordOptions.roots.push(n);
-      } else {
-        let index = this.chordOptions.roots.indexOf(n);
-        if(index >= 0) {
-          this.chordOptions.roots.splice(index,1);
-        }
-      }
+       if(root) {
+        this.chordOptions.roots |= (1<<n);
+       } else {
+        this.chordOptions.roots &= ~(1<<n);
+       }
     }
 
     private getRootN(n:number) {
-      return this.chordOptions.roots.indexOf(n) >= 0;
+      return this.chordOptions.roots & (1<<n);
     }
 
     guitarPlayer : GuitarPlayer = new GuitarPlayer();
