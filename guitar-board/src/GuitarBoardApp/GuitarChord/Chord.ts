@@ -1,5 +1,6 @@
 import Tone from "../GuitarPlayer/Tone";
 import Location from "../GuitarPlayer/Location";
+import ChordType from "./ChordType";
 
 class Chord {
     public name:string = "";
@@ -61,28 +62,29 @@ class Chord {
         return true;
     }
 
-    public isColor(color:string) {
-        if(color == "major") {
-            return /^(#|b)?[A-G](\/(#|b)?[A-G])?$/.test(this.name);
-        }
-        if(color == "minor") {
-            return /^(#|b)?[A-G]m(\/(#|b)?[A-G])?$/.test(this.name);
-        }
-        return new RegExp(`^(#|b)?[A-G]${color}(\/(#|b)?[A-G])?$`).test(this.name);
+    public isType(type:ChordType) {
+       return this.type == type;
     }
 
-    public get color() : string {
+    public isInTypes(types:number) {
+        return (1<<this.type) & types;
+    }
+
+    public get type() : ChordType {
+        if(this.isChord_2) {
+            return ChordType.interval;
+        }
         if(this.isChord_3) {
-            return "major";
+            return ChordType.major;
         }
         if(this.isChord_m3) {
-            return "minor";
+            return ChordType.minor;
         }
         let res = /^(#|b)?[A-G]([^\/]+)/.exec(this.name);
         if(res == null) {
-            return "";
+            return ChordType.unkown;
         }
-        return res[2];
+        return ChordType[res[2] as keyof typeof ChordType];
     }
 
     public get isChord_2() {

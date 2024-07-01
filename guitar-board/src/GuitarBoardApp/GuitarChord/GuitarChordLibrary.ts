@@ -34,41 +34,8 @@ export default class GuitarChordLibrary {
         if(options.natural != null && options.natural) {
             chords = chords.filter((chord)=>chord.isNatural);
         }
-        if(options.chord_2 != null && !options.chord_2) {
-            chords = chords.filter((chord)=>!chord.isChord_2);
-        }
-        if(options.chord_3 != null && !options.chord_3) {
-            chords = chords.filter((chord)=>!chord.isChord_3);
-        }
-        if(options.chord_m3 != null && !options.chord_m3) {
-            chords = chords.filter((chord)=>!chord.isChord_m3);
-        }
-        if(options.chord_aug3 != null && !options.chord_aug3) {
-            chords = chords.filter((chord)=>!chord.isColor("aug"));
-        }
-        if(options.chord_dim3 != null && !options.chord_dim3) {
-            chords = chords.filter((chord)=>!chord.isColor("dim"));
-        }
-        if(options.chord_sus2 != null && !options.chord_sus2) {
-            chords = chords.filter((chord)=>!chord.isColor("sus2"));
-        }
-        if(options.chord_sus4 != null && !options.chord_sus4) {
-            chords = chords.filter((chord)=>!chord.isColor("sus4"));
-        }
-        if(options.chord_maj7 != null && !options.chord_maj7) {
-            chords = chords.filter((chord)=>!chord.isColor("maj7"));
-        }
-        if(options.chord_m7 != null && !options.chord_m7) {
-            chords = chords.filter((chord)=>!chord.isColor("m7"));
-        }
-        if(options.chord_m7b5 != null && !options.chord_m7b5) {
-            chords = chords.filter((chord)=>!chord.isColor("m7b5"));
-        }
-        if(options.chord_7 != null && !options.chord_7) {
-            chords = chords.filter((chord)=>!chord.isColor("7"));
-        }
-        if(options.chord_mM7 != null && !options.chord_mM7) {
-            chords = chords.filter((chord)=>!chord.isColor("mM7"));
+        if(options.chordTypes != null) {
+            chords = chords.filter((chord)=>chord.isInTypes(options.chordTypes));
         }
         
         if(options.roots != null) {
@@ -592,7 +559,7 @@ export default class GuitarChordLibrary {
             notes: "8a88"
         },
         {
-            name: "C7",
+            name: "Cdom7",
             slideFrom: -8,
             slide: 12,
             root: 5,
@@ -630,7 +597,7 @@ export default class GuitarChordLibrary {
             notes: "x3534"
         },
         {
-            name: "C7",
+            name: "Cdom7",
             slide: 9,
             root: 4,
             notes: "x3535"
@@ -662,7 +629,7 @@ export default class GuitarChordLibrary {
             notes:"xx0211"
         },
         {
-            name:"D7",
+            name:"Ddom7",
             slide:12,
             root: 3,
             notes:"xx0212"

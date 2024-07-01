@@ -91,19 +91,8 @@
             <tr>
               <td class="setting_title">和弦类型</td>
               <td class="setting_row">
-                <div class="nowrap">音程:<input type="checkbox" v-model.boolean="chordOptions.chord_2" class="inputSpacing"></div>
-                <div class="nowrap">大三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_3" class="inputSpacing"></div>
-                <div class="nowrap">小三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m3" class="inputSpacing"></div>
-                <div class="nowrap">增三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_aug3" class="inputSpacing"></div>
-                <div class="nowrap">减三和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_dim3" class="inputSpacing"></div>
-                <div class="nowrap">挂二和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_sus2" class="inputSpacing"></div>
-                <div class="nowrap">挂四和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_sus4" class="inputSpacing"></div>
-                <div class="nowrap">大七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_maj7" class="inputSpacing"></div>
-                <div class="nowrap">小七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m7" class="inputSpacing"></div>
-                <div class="nowrap">属七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_7" class="inputSpacing"></div>
-                <div class="nowrap">小大七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_mM7" class="inputSpacing"></div>
-                <div class="nowrap">半减七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_m7b5" class="inputSpacing"></div>
-                <div class="nowrap">减七和弦:<input type="checkbox" v-model.boolean="chordOptions.chord_dim7" class="inputSpacing"></div>
+                <div v-for="typeOption in chordTypeOptions" class="nowrap">{{ typeOption.name }}<input @change="setChordTypeOn(typeOption.type,$event.target.checked)" :checked="(1<<typeOption.type)&chordOptions.chordTypes" type="checkbox" class="inputSpacing"></div>
+               
               </td>
             </tr>
             <tr v-if="chordOptions.chord_2">
@@ -184,6 +173,7 @@ import GuitarChordSearchOptions from '../GuitarChord/GuitarChordSearchOptions';
 import Instrument from '../GuitarPlayer/Instrument';
 import GuitarChordPracticleView from "./GuitarChordPracticeView.vue";
 import Dialog from "./components/Dialog.vue";
+import ChordType from '../GuitarChord/ChordType';
 
   @Options({
     components: {
@@ -227,6 +217,28 @@ import Dialog from "./components/Dialog.vue";
     selectedChord : Chord | null = null;
 
     chordOptions : GuitarChordSearchOptions = new GuitarChordSearchOptions();
+
+    get chordTypeOptions() {
+      let options = [];
+      for(let key in ChordType) {
+         let type = ChordType[key];
+         if(typeof type == 'number' && type != ChordType.unkown) {
+             options.push({
+              name : key,
+              type : type
+             })
+         }
+      }
+      return options;
+    }
+
+    setChordTypeOn(chordType:ChordType,on:boolean) {
+      if(on) {
+        this.chordOptions.chordTypes |= (1<<chordType);
+      } else {
+        this.chordOptions.chordTypes &= ~(1<<chordType);
+      }
+    }
 
     private getIntervalName(interval:number) {
       switch(interval){

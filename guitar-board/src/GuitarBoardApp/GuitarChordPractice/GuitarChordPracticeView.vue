@@ -37,14 +37,14 @@
         <td><label style="font-weight: bold;">色彩:</label></td>
         <td>
           <div style="white-space: wrap;">
-            <div v-for="item in colorOptions" style="display:inline-block;white-space:nowrap;">
-              {{ item }}<input type="radio" name="color" @click="answer_color=item" :checked="answer_color==item" :value="item" style="margin-right: 15px;">
+            <div v-for="item in typeOptions" style="display:inline-block;white-space:nowrap;">
+              {{ item.name }}<input type="radio" name="color" @click="answer_type=item.type" style="margin-right: 15px;">
             </div>
           </div>
         </td>
         <td>
-          <img v-if="answer_color_result" style="width:32px;height:32px;" :src="require('./assets/right.svg')">
-          <img v-if="answer_color_result!=null&&!answer_color_result" style="width:32px;height:32px;" :src="require('./assets/wrong.svg')">
+          <img v-if="answer_type_result" style="width:32px;height:32px;" :src="require('./assets/right.svg')">
+          <img v-if="answer_type_result!=null&&!answer_type_result" style="width:32px;height:32px;" :src="require('./assets/wrong.svg')">
         </td>
       </tr>
     </table>
@@ -62,6 +62,7 @@
 import { Options, Vue } from 'vue-class-component';
 import Chord from '../GuitarChord/Chord';
 import GuitarPlayer from '../GuitarPlayer/GuitarPlayer';
+import ChordType from '../GuitarChord/ChordType';
 
 @Options({
   components: {
@@ -103,8 +104,8 @@ export default class GuitarChordPracticeView extends Vue {
         fullRight = false;
       }
     } else {
-      this.answer_color_result = this.answer_color == null ? false : this.currentChord.isColor(this.answer_color);
-      if(!this.answer_color_result) {
+      this.answer_type_result = this.answer_type == null ? false : this.currentChord.isType(this.answer_type);
+      if(!this.answer_type_result) {
         fullRight = false;
       }
     }
@@ -122,9 +123,9 @@ export default class GuitarChordPracticeView extends Vue {
     this.confirm_visible = true;
     this.next_visible = false;
     this.answer_level_result = null;
-    this.answer_color_result = null;
+    this.answer_type_result = null;
     this.answer_interval_result = null;
-    this.answer_color = null;
+    this.answer_type = null;
     this.answer_interval = null;
     this.answer_level = null;
     this._currentIndex = Math.floor(Math.random()*this.allChords.length);
@@ -150,11 +151,11 @@ export default class GuitarChordPracticeView extends Vue {
   static guitarPlayer = new GuitarPlayer();
 
   answer_level : number|null = null;
-  answer_color : string|null = null;
+  answer_type : ChordType|null = null;
   answer_interval : number|null = null;
 
   answer_level_result : boolean | null = null;
-  answer_color_result : boolean | null = null;
+  answer_type_result : boolean | null = null;
   answer_interval_result : boolean | null = null;
 
   get intervalOptions() {
@@ -177,10 +178,13 @@ export default class GuitarChordPracticeView extends Vue {
     return options; 
   }
 
-  get colorOptions() {
+  get typeOptions() {
     let set = new Set();
     for(let i = 0 ; i < this.allChords.length; ++i) {
-      set.add(this.allChords[i].color);
+      set.add({
+        type:this.allChords[i].type,
+        name:ChordType[this.allChords[i].type]
+      });
     }
     return set;
   }
