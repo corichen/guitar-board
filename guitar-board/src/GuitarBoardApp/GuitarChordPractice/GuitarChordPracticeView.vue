@@ -7,9 +7,12 @@
       <tr>
         <td><label style="font-weight: bold;">级数:</label></td>
         <td>
-          <div v-for="index in 7" style="display:inline-block">
-            {{ index }}级<input type="radio" name="level" @click="answer_level=index" :checked="answer_level==index" style="margin-right: 15px;">
+          <div style="white-space: wrap;">
+            <div v-for="level in levelOptions" style="display:inline-block;white-space: nowrap;">
+              {{ level.name }}级<input type="radio" name="level" @click="answer_level=level.index" :checked="answer_level==level.index" style="margin-right: 15px;">
+            </div>
           </div>
+         
         </td>
         <td>
           <img v-if="answer_level_result" style="width:32px;height:32px;" :src="require('./assets/right.svg')">
@@ -155,11 +158,17 @@ export default class GuitarChordPracticeView extends Vue {
   answer_interval_result : boolean | null = null;
 
   get intervalOptions() {
+    let intervalSet = new Set<number>();
+    for(let i = 0 ; i < this.allChords.length; ++i) {
+      intervalSet.add(this.allChords[i].interval);
+    }
+    let intervals = Array.from(intervalSet);
+
     let options = [];
-    for(let i = 0 ; i < 21; ++i) {
+    for(let i = 0 ; i < intervals.length; ++i) {
       options.push({
-        interval : i+1,
-        name: Chord.getIntervalName(i+1)
+        interval : intervals[i],
+        name: Chord.getIntervalName(intervals[i])
       });
     }
     return options; 
@@ -171,6 +180,27 @@ export default class GuitarChordPracticeView extends Vue {
       set.add(this.allChords[i].color);
     }
     return set;
+  }
+
+  get levelOptions() {
+    let set = new Set();
+    for(let i = 0 ; i < this.allChords.length; ++i) {
+      set.add(this.allChords[i].indexInTone);
+    }
+    let names = ["1","#1","2","b3","3","4","#4","5","b6","6","b7","7"];
+    let indexes = Array.from(set) as number[];
+    let levelOptions = [];
+    for(let i = 0 ; i < indexes.length; ++i) {
+      levelOptions.push({
+        name : names[indexes[i]%12],
+        index : indexes[i]
+      })
+    }
+    levelOptions.sort((left:{name:string,index:number},right:{name:string,index:number})=>{
+      return left.index - right.index;
+    })
+    return levelOptions;
+    
   }
 
   _currentIndex : number = 0;
