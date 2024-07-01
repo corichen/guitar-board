@@ -17,14 +17,11 @@ export default class GuitarChordLibrary {
             return chords;
         }
 
-        let level1Chords = this.searchChords(new RegExp("^"+names[(fromIndex)%names.length]+".*$"));
-        let level2Chords = this.searchChords(new RegExp("^"+names[(fromIndex+2)%names.length]+".*$"));
-        let level3Chords = this.searchChords(new RegExp("^"+names[(fromIndex+4)%names.length]+".*$"));
-        let level4Chords = this.searchChords(new RegExp("^"+names[(fromIndex+5)%names.length]+".*$"));
-        let level5Chords = this.searchChords(new RegExp("^"+names[(fromIndex+7)%names.length]+".*$"));
-        let level6Chords = this.searchChords(new RegExp("^"+names[(fromIndex+9)%names.length]+".*$"));
-        let level7Chords = this.searchChords(new RegExp("^"+names[(fromIndex+11)%names.length]+".*$"));
-        chords = chords.concat(level1Chords).concat(level2Chords).concat(level3Chords).concat(level4Chords).concat(level5Chords).concat(level6Chords).concat(level7Chords);
+        for(let interval = 0 ; interval < 12; ++interval) {
+            if(options.levels & 1<<interval) {
+                chords = chords.concat(this.searchChords(new RegExp("^"+names[(fromIndex+interval)%names.length]+".*$")));
+            }
+        }
         
         chords.map((chord)=>{
             if(options.baseTone != null) {
@@ -47,31 +44,31 @@ export default class GuitarChordLibrary {
             chords = chords.filter((chord)=>!chord.isChord_m3);
         }
         if(options.chord_aug3 != null && !options.chord_aug3) {
-            chords = chords.filter((chord)=>!chord.isChord_aug3);
+            chords = chords.filter((chord)=>!chord.isColor("aug"));
         }
         if(options.chord_dim3 != null && !options.chord_dim3) {
-            chords = chords.filter((chord)=>!chord.isChord_dim3);
+            chords = chords.filter((chord)=>!chord.isColor("dim"));
         }
         if(options.chord_sus2 != null && !options.chord_sus2) {
-            chords = chords.filter((chord)=>!chord.isChord_sus2);
+            chords = chords.filter((chord)=>!chord.isColor("sus2"));
         }
         if(options.chord_sus4 != null && !options.chord_sus4) {
-            chords = chords.filter((chord)=>!chord.isChord_sus4);
+            chords = chords.filter((chord)=>!chord.isColor("sus4"));
         }
         if(options.chord_maj7 != null && !options.chord_maj7) {
-            chords = chords.filter((chord)=>!chord.isChord_maj7);
+            chords = chords.filter((chord)=>!chord.isColor("maj7"));
         }
         if(options.chord_m7 != null && !options.chord_m7) {
-            chords = chords.filter((chord)=>!chord.isChord_m7);
+            chords = chords.filter((chord)=>!chord.isColor("m7"));
         }
         if(options.chord_m7b5 != null && !options.chord_m7b5) {
-            chords = chords.filter((chord)=>!chord.isChord_m7b5);
+            chords = chords.filter((chord)=>!chord.isColor("m7b5"));
         }
         if(options.chord_7 != null && !options.chord_7) {
-            chords = chords.filter((chord)=>!chord.isChord_7);
+            chords = chords.filter((chord)=>!chord.isColor("7"));
         }
         if(options.chord_mM7 != null && !options.chord_mM7) {
-            chords = chords.filter((chord)=>!chord.isChord_mM7);
+            chords = chords.filter((chord)=>!chord.isColor("mM7"));
         }
         
         if(options.roots != null) {

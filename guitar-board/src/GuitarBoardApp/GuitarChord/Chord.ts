@@ -71,6 +71,20 @@ class Chord {
         return new RegExp(`^(#|b)?[A-G]${color}(\/(#|b)?[A-G])?$`).test(this.name);
     }
 
+    public get color() : string {
+        if(this.isChord_3) {
+            return "major";
+        }
+        if(this.isChord_m3) {
+            return "minor";
+        }
+        let res = /^(#|b)?[A-G]([^\/]+)/.exec(this.name);
+        if(res == null) {
+            return "";
+        }
+        return res[2];
+    }
+
     public get isChord_2() {
         return this.notes.length == 2;
     }
@@ -81,46 +95,6 @@ class Chord {
 
     public get isChord_m3() {
         return /^(#|b)?[A-G]m$/.test(this.name);
-    }
-
-    public get isChord_aug3() {
-        return /^(#|b)?[A-G]aug$/.test(this.name);
-    }
-
-    public get isChord_dim3() {
-        return /^(#|b)?[A-G]dim$/.test(this.name);
-    }
-
-    public get isChord_sus2() {
-        return /^(#|b)?[A-G]sus2$/.test(this.name);
-    }
-
-    public get isChord_sus4() {
-        return /^(#|b)?[A-G]sus4$/.test(this.name);
-    }
-
-    public get isChord_maj7() {
-        return  /^(#|b)?[A-G]maj7$/.test(this.name);
-    }
-
-    public get isChord_m7() {
-        return  /^(#|b)?[A-G]m7$/.test(this.name);
-    }
-
-    public get isChord_m7b5() {
-        return  /^(#|b)?[A-G]m7b5$/.test(this.name);
-    }
-
-    public get isChord_7() {
-        return  /^(#|b)?[A-G]7$/.test(this.name);
-    }
-
-    public get isChord_mM7() {
-        return  /^(#|b)?[A-G]mM7$/.test(this.name);
-    }
-
-    public get isSus() {
-        return this.name.indexOf("sus") > 0;
     }
 
     public get isTransform() {
@@ -214,7 +188,7 @@ class Chord {
         return index + 16;
     }
 
-    public get levelInTone() {
+    public get indexInTone() {
         let toneIndex = 0;
         if(this.tone != null) {
             toneIndex = this.tone;
@@ -227,23 +201,7 @@ class Chord {
         let nameIndex = names.indexOf(baseName) + 12;
         
         let indexInTone = (nameIndex - toneIndex) % 12;
-        switch(indexInTone){
-            case 0:case 1:
-                return 1;
-            case 2:
-                return 2;
-            case 3:case 4:
-                return 3;
-            case 5:case 6:
-                return 4;
-            case 7:
-                return 5;
-            case 8:case 9:
-                return 6;
-            case 10:case 11:
-                return 7;
-        }
-        return 0;
+        return indexInTone;
     }
 
     public get nameInTone() {

@@ -90,7 +90,7 @@ export default class GuitarChordPracticeView extends Vue {
       return;
     }
     let fullRight = true;
-    this.answer_level_result = this.answer_level == this.currentChord.levelInTone;
+    this.answer_level_result = this.answer_level == this.currentChord.indexInTone;
     if(!this.answer_level_result) {
       fullRight = false;
     }
@@ -166,7 +166,11 @@ export default class GuitarChordPracticeView extends Vue {
   }
 
   get colorOptions() {
-    return ["major","minor","aug","dim","sus2","sus4","maj7","m7","7","m7b5","dim7","mM7"];
+    let set = new Set();
+    for(let i = 0 ; i < this.allChords.length; ++i) {
+      set.add(this.allChords[i].color);
+    }
+    return set;
   }
 
   _currentIndex : number = 0;

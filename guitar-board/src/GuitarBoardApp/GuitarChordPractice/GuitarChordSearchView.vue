@@ -38,13 +38,15 @@
   
       <div style="margin-top: 10px;">
         <table>
-          <tr v-for="level in 7">
-            <td>{{level}}级</td>
-            <td style="display: flex;flex-direction: row;flex-wrap:nowrap;">
-              <template v-for="chord in chords.sort((a:Chord,b:Chord)=>{if(a.rootNote!=null && b.rootNote!=null)return a.rootNote.index-b.rootNote.index;return 0;})">
-                <ChordView v-if="chord.levelInTone==level" :chord="chord" @chord-click="onChordClick(chord)" :style="{border:chord==this.selectedChord?'1px dashed #000':'none'}" ></ChordView>
-              </template>
-            </td>
+          <tr v-for="(level,index) in  ['1','#1','2','b3','3','4','#4','5','b6','6','b7','7']">
+            <template v-if="chordOptions.levels & (1<<index)">
+              <td>{{level}}级</td>
+              <td style="display: flex;flex-direction: row;flex-wrap:nowrap;">
+                <template v-for="chord in chords.sort((a:Chord,b:Chord)=>{if(a.rootNote!=null && b.rootNote!=null)return a.rootNote.index-b.rootNote.index;return 0;})">
+                  <ChordView v-if="chord.indexInTone==index" :chord="chord" @chord-click="onChordClick(chord)" :style="{border:chord==this.selectedChord?'1px dashed #000':'none'}" ></ChordView>
+                </template>
+              </td>
+            </template>
           </tr>
         </table>
       </div>
@@ -74,6 +76,17 @@
               <td class="setting_title">顺接和弦</td>
               <td class="setting_row">
                 <input type="checkbox" v-model.boolean="chordOptions.natural" class="inputSpacing"> <br>
+              </td>
+            </tr>
+            <tr>
+              <td class="setting_title">和弦级数</td>
+              <td class="setting_row">
+                <template v-if="chordOptions.natural">
+                  <div v-for="index in 7" class="nowrap">{{index}}级<input type="checkbox" class="inputSpacing"></div>
+                </template>
+                <template v-else>
+                  <div v-for="(level,index) in ['1','#1','2','b3','3','4','#4','5','b6','6','b7','7']" class="nowrap">{{level}}级<input @change="chordOptions.levels=$event.target.checked?(chordOptions.levels|(1<<index)):(chordOptions.levels&~(1<<index))" type="checkbox" class="inputSpacing" :checked="chordOptions.levels&(1<<index)"></div>
+                </template>
               </td>
             </tr>
             <tr>
