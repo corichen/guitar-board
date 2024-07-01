@@ -81,11 +81,10 @@
             <tr>
               <td class="setting_title">和弦级数</td>
               <td class="setting_row">
-                <template v-if="chordOptions.natural">
-                  <div v-for="index in 7" class="nowrap">{{index}}级<input type="checkbox" class="inputSpacing"></div>
-                </template>
-                <template v-else>
-                  <div v-for="(level,index) in ['1','#1','2','b3','3','4','#4','5','b6','6','b7','7']" class="nowrap">{{level}}级<input @change="chordOptions.levels=$event.target.checked?(chordOptions.levels|(1<<index)):(chordOptions.levels&~(1<<index))" type="checkbox" class="inputSpacing" :checked="chordOptions.levels&(1<<index)"></div>
+                <template v-for="(level,index) in ['1','#1','2','b3','3','4','#4','5','b6','6','b7','7']">
+                  <template v-if="!chordOptions.natural || !/(#|b)[1-7]/.test(level)">
+                    <div  class="nowrap">{{level}}级<input @change="chordOptions.levels=$event.target.checked?(chordOptions.levels|(1<<index)):(chordOptions.levels&~(1<<index))" type="checkbox" class="inputSpacing" :checked="chordOptions.levels&(1<<index)"></div>
+                  </template>
                 </template>
               </td>
             </tr>

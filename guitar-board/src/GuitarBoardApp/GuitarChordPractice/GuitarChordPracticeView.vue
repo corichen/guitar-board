@@ -24,7 +24,7 @@
         <td>
           <div style="display: inline-block;white-space:wrap;margin-top:10px;">
             <div v-for="item in intervalOptions" style="display:inline-block;white-space:nowrap;">
-              {{ item.name }}<input type="radio" name="interval" @click="answer_interval=item.interval" @checked="answer_interval==item.interval" :value="item.interval" style="margin-right: 10px;">
+              {{ item.name }}<input type="radio" name="interval" @click="answer_interval=item.interval" :checked="answer_interval==item.interval" style="margin-right: 10px;">
             </div>
           </div>
         </td>
@@ -171,6 +171,9 @@ export default class GuitarChordPracticeView extends Vue {
         name: Chord.getIntervalName(intervals[i])
       });
     }
+    options.sort((left,right)=>{
+      return left.interval - right.interval;
+    })
     return options; 
   }
 
@@ -196,7 +199,7 @@ export default class GuitarChordPracticeView extends Vue {
         index : indexes[i]
       })
     }
-    levelOptions.sort((left:{name:string,index:number},right:{name:string,index:number})=>{
+    levelOptions.sort((left,right)=>{
       return left.index - right.index;
     })
     return levelOptions;

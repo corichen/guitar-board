@@ -18,7 +18,7 @@ export default class GuitarChordLibrary {
         }
 
         for(let interval = 0 ; interval < 12; ++interval) {
-            if(options.levels & 1<<interval) {
+            if(options.levels & (1<<interval)) {
                 chords = chords.concat(this.searchChords(new RegExp("^"+names[(fromIndex+interval)%names.length]+".*$")));
             }
         }
@@ -88,22 +88,34 @@ export default class GuitarChordLibrary {
         return chords;
     }
 
-    public static searchChords(namePattern:RegExp,slideChords:boolean=true) {
-        let chords : Chord[] = [];
+    private static chords : Chord[] = [];
+
+    public static searchChords(namePattern:RegExp) {
+        let chords : Chord[] = this.buildChords();
+        if(namePattern != null) {
+            chords = chords.filter(chord=>namePattern.test(chord.name));
+        }
+        return chords;
+      }
+
+
+      private static buildChords() :Chord[]{
+        let chords : Chord[] = GuitarChordLibrary.chords;
+        if(chords.length > 0) {
+            return chords;
+        }
         let chordsJason = GuitarChordLibrary.chordSources;
         const names = ['C',"#C","D","bE","E","F","#F","G","bA","A","bB","B"];
         for(let i = 0 ; i < chordsJason.length; ++i) {
           let chordObj = chordsJason[i];
           let slideCount = 1;
           let slideFrom = 0;
-          if(slideChords) {
             if(chordObj.slide != null && chordObj.slide > 1){
-              slideCount = chordObj.slide + 1;
+                slideCount = chordObj.slide + 1;
             }
             if(chordObj.slideFrom != null) {
-              slideFrom = chordObj.slideFrom;
+                slideFrom = chordObj.slideFrom;
             }
-          }
           
           for(let s = slideFrom ; s < slideCount + slideFrom; ++s){
             let chord = new Chord();
@@ -154,10 +166,7 @@ export default class GuitarChordLibrary {
               chord.notes.push(loc);
               str++;
             }
-  
-            if(namePattern == null || namePattern.test(chord.name)){
-              chords.push(chord);
-            }
+            chords.push(chord);
           }
         }
         return chords;
