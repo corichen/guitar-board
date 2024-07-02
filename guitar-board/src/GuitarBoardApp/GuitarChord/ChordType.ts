@@ -1,5 +1,4 @@
 enum ChordType {
-    unkown,
     interval, // 两个音组成的音程
     major, // 大三和弦
     minor, // 小三和弦

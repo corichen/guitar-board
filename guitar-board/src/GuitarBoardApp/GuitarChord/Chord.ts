@@ -82,7 +82,7 @@ class Chord {
         }
         let res = /^(#|b)?[A-G]([^\/]+)/.exec(this.name);
         if(res == null) {
-            return ChordType.unkown;
+            return ChordType.major;
         }
         return ChordType[res[2] as keyof typeof ChordType];
     }

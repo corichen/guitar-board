@@ -39,7 +39,7 @@
       <div style="margin-top: 10px;">
         <table>
           <tr v-for="(level,index) in  ['1','#1','2','b3','3','4','#4','5','b6','6','b7','7']">
-            <template v-if="chordOptions.levels & (1<<index)">
+            <template v-if="options.chordOptions.levels & (1<<index)">
               <td>{{level}}级</td>
               <td style="display: flex;flex-direction: row;flex-wrap:nowrap;">
                 <template v-for="chord in chords.sort((a:Chord,b:Chord)=>{if(a.rootNote!=null && b.rootNote!=null)return a.rootNote.index-b.rootNote.index;return 0;})">
@@ -53,60 +53,34 @@
 
       <Dialog :visible="optionsVisible" @close="optionsVisible=false" title="选项">
         <table style="margin:20px 20px 40px 20px;">
-            <tr >
+          <tr >
               <td class="setting_title">首调</td>
               <td class="setting_row">
-                <select v-model="chordOptions.baseTone" class="inputSpacing">
-                  <option value="0">C</option>
-                  <option value="1">#C</option>
-                  <option value="2">D</option>
-                  <option value="3">bE</option>
-                  <option value="4">E</option>
-                  <option value="5">F</option>
-                  <option value="6">#F</option>
-                  <option value="7">G</option>
-                  <option value="8">bA</option>
-                  <option value="9">A</option>
-                  <option value="10">bB</option>
-                  <option value="11">B</option>
-                </select>
+                <Selector @select="options.chordOptions.baseTone=$event.options[0]" :selected="1<<options.chordOptions.baseTone" :mutiple="false" :options="['C','#C','D','bE','E','F','#F','G','bA','A','bB','B']"></Selector>
               </td>
             </tr>
             <tr>
               <td class="setting_title">顺接和弦</td>
               <td class="setting_row">
-                <input type="checkbox" v-model.boolean="chordOptions.natural" class="inputSpacing"> <br>
+                <input type="checkbox" v-model.boolean="options.chordOptions.natural" class="inputSpacing"> <br>
               </td>
             </tr>
             <tr>
               <td class="setting_title">和弦级数</td>
               <td class="setting_row">
-                <template v-for="(level,index) in ['1','#1','2','b3','3','4','#4','5','b6','6','b7','7']">
-                  <template v-if="!chordOptions.natural || !/(#|b)[1-7]/.test(level)">
-                    <div  class="nowrap">{{level}}级<input @change="chordOptions.levels=$event.target.checked?(chordOptions.levels|(1<<index)):(chordOptions.levels&~(1<<index))" type="checkbox" class="inputSpacing" :checked="chordOptions.levels&(1<<index)"></div>
-                  </template>
-                </template>
+                <Selector @select="options.chordOptions.levels=$event.selected" :mutiple="true" :selected="options.chordOptions.levels" :options="['1','#1','2','b3','3','4','#4','5','b6','6','b7','7']"></Selector>
               </td>
             </tr>
             <tr>
               <td class="setting_title">和弦类型</td>
               <td class="setting_row">
-                <div v-for="typeOption in chordTypeOptions" class="nowrap">{{ typeOption.name }}<input @change="setChordTypeOn(typeOption.type,$event.target.checked)" :checked="(1<<typeOption.type)&chordOptions.chordTypes" type="checkbox" class="inputSpacing"></div>
-               
+                <Selector @select="this.options.chordOptions.chordTypes=$event.selected" :selected="this.options.chordOptions.chordTypes"  :options="chordTypeOptions"></Selector>
               </td>
             </tr>
-            <tr v-if="chordOptions.chord_2">
-              <td class="setting_title">
-                音程:
-              </td>
+            <tr v-if="options.chordOptions.chordTypes&(1<<0)">
+              <td class="setting_title">音程</td>
               <td class="setting_row">
-                <div style="white-space:wrap;">
-                  <template v-for="index in 21">
-                  <div style="display:inline-block;white-space: nowrap;">
-                    {{ getIntervalName(index) }}<input type="checkbox" @change="setIntervalOn(index,($event.target as any).checked)" :checked="getIntervalOn(index)" class="inputSpacing">
-                  </div>
-                  </template>
-                </div>
+                <Selector @select="this.options.chordOptions.intervals=$event.selected" :selected="this.options.chordOptions.intervals"  :options="intervalOptions"></Selector>
               </td>
             </tr>
             <tr>
@@ -114,8 +88,8 @@
               根音范围
               </td>
               <td class="setting_row">
-                最低品:<input type="range" v-model.number="chordOptions.rootMin" min="0" max="12" step="1" ><div style="display: inline-block;" class="inputSpacing">{{ chordOptions.rootMin }}</div>
-                最高品:<input type="range" v-model.number="chordOptions.rootMax" min="3" max="15" step="1">{{ chordOptions.rootMax }}
+                最低品:<input type="range" v-model.number="options.chordOptions.rootMin" min="0" max="12" step="1" ><div style="display: inline-block;" class="inputSpacing">{{ options.chordOptions.rootMin }}</div>
+                最高品:<input type="range" v-model.number="options.chordOptions.rootMax" min="3" max="15" step="1">{{ options.chordOptions.rootMax }}
                 <br>
                 <template v-for="index in [5,4,3,2,1]">
                   根音在{{ index+1 }}弦:<input type="checkbox" @change="setRootN(index,($event.target as any).checked)" :checked="getRootN(index)"  class="inputSpacing">
@@ -125,25 +99,31 @@
             <tr>
               <td class="setting_title">弹奏模式</td>
               <td class="setting_row">
-                <input v-model.number="playDelay" type="radio" name="playMode" :value="10">扫弦 <input v-model.number="playDelay" type="radio" name="playMode" :value="200">分解
+                <input v-model.number="options.playDelay" type="radio" name="playMode" :value="10">扫弦 <input v-model.number="options.playDelay" type="radio" name="playMode" :value="200">分解
               </td>
             </tr>
             <tr>
               <td class="setting_title">显示指板音</td>
               <td class="setting_row">
-                <input v-model.boolean="this.naturalNotesVisible" type="checkbox">
+                <input v-model.boolean="this.options.naturalNotesVisible" type="checkbox">
               </td>
             </tr>
             <tr>
               <td class="setting_title">指板样式</td>
               <td class="setting_row">
-                逻辑<input v-model.number="boardStyle" type="radio" name="boardStyle" :value="0"> 写实<input v-model.number="boardStyle" type="radio" name="boardStyle" :value="1">
+                逻辑<input v-model.number="options.boardStyle" type="radio" name="boardStyle" :value="0"> 写实<input v-model.number="options.boardStyle" type="radio" name="boardStyle" :value="1">
               </td>
             </tr>
             <tr>
               <td class="setting_title">显示指法</td>
               <td class="setting_row">
-                <input v-model.boolean="this.fingerVisible" type="checkbox">
+                <input v-model.boolean="this.options.fingerVisible" type="checkbox">
+              </td>
+            </tr>
+            <tr>
+              <td class="setting_title">保存选项</td>
+              <td class="setting_row">
+                <a :href="`index.html?options=${optionsToString()}`" target="_blank">新链接</a>
               </td>
             </tr>
           </table> 
@@ -173,6 +153,7 @@ import GuitarChordSearchOptions from '../GuitarChord/GuitarChordSearchOptions';
 import Instrument from '../GuitarPlayer/Instrument';
 import GuitarChordPracticleView from "./GuitarChordPracticeView.vue";
 import Dialog from "./components/Dialog.vue";
+import Selector from "./components/Selector.vue";
 import ChordType from '../GuitarChord/ChordType';
 
   @Options({
@@ -180,23 +161,30 @@ import ChordType from '../GuitarChord/ChordType';
       GuitarBoardView,
       ChordView,
       GuitarChordPracticleView,
-      Dialog
+      Dialog,
+      Selector
     },
     watch:{
-      chordOptions: {
+      'options.chordOptions': {
         handler(newValue){
           this.loadChords();
         },
         deep:true
       },
-      naturalNotesVisible(){
-        this.updateNotes();
+      'options.naturalNotesVisible':{
+        handler(newValue) {
+          this.updateNotes();
+        }
       },
-      boardStyle() {
-        this.guitarBoardView.setStyle(this.boardStyle);
+      'options.boardStyle': {
+        handler(newValue){
+          this.guitarBoardView.setStyle(this.options.boardStyle);
+        }
       },
-      fingerVisible(newValue) {
-        this.guitarBoardView.setFingerVisible(newValue);
+      'options.fingerVisible': {
+        handler(newValue){
+          this.guitarBoardView.setFingerVisible(newValue);
+        }
       }
     }
   })
@@ -204,44 +192,71 @@ import ChordType from '../GuitarChord/ChordType';
     
     practiceEnable : boolean = false;
 
-    boardStyle : number = 0;
-
-    naturalNotesVisible:boolean = false;
-
-    fingerVisible: boolean = true;
-
     optionsVisible:boolean = false;
 
     chords : Chord[] = [];
 
     selectedChord : Chord | null = null;
 
-    chordOptions : GuitarChordSearchOptions = new GuitarChordSearchOptions();
+    options = {
+      boardStyle : 0,
+      naturalNotesVisible: false,
+      fingerVisible: true,
+      playDelay : 10,
+      chordOptions : new GuitarChordSearchOptions()
+    }
+
+    optionsToString() {
+        return btoa(JSON.stringify(this.options));
+    }
+
+    optionsFromString(base64:string) {
+        let json = atob(base64);
+        let obj = JSON.parse(json);
+        Object.assign(this.options,obj);
+    }
 
     get chordTypeOptions() {
       let options = [];
       for(let key in ChordType) {
          let type = ChordType[key];
-         if(typeof type == 'number' && type != ChordType.unkown) {
+         if(typeof type == 'number') {
              options.push({
-              name : key,
-              type : type
+              name: key,
+              type: type
              })
          }
       }
+      //options.sort((left,right)=>left.type-right.type);
+      options = options.map(item=>item.name);
       return options;
+    }
+
+    getChordTypeOn(chordType:ChordType) {
+      return this.options.chordOptions.chordTypes & (1<<chordType);
     }
 
     setChordTypeOn(chordType:ChordType,on:boolean) {
       if(on) {
-        this.chordOptions.chordTypes |= (1<<chordType);
+        this.options.chordOptions.chordTypes |= (1<<chordType);
       } else {
-        this.chordOptions.chordTypes &= ~(1<<chordType);
+        this.options.chordOptions.chordTypes &= ~(1<<chordType);
       }
+    }
+
+    get intervalOptions() {
+      let options = [];
+      for(let i = 0 ; i < 22; ++i) {
+        options.push(
+          this.getIntervalName(i)
+        );
+      }
+      return options;
     }
 
     private getIntervalName(interval:number) {
       switch(interval){
+        case 0:return "纯一度";
         case 1:return "小二度";
         case 2:return "大二度";
         case 3:return "小三度";
@@ -269,42 +284,42 @@ import ChordType from '../GuitarChord/ChordType';
 
     private setIntervalOn(interval:number,on:boolean) {
       if(on) {
-        this.chordOptions.intervals |= (1 << interval);
+        this.options.chordOptions.intervals |= (1 << interval);
       } else {
-        this.chordOptions.intervals &= ~(1 << interval);
+        this.options.chordOptions.intervals &= ~(1 << interval);
       }
     }
 
     private getIntervalOn(interval:number) {
-      return this.chordOptions.intervals & (1<<interval);
+      return this.options.chordOptions.intervals & (1<<interval);
     }
 
     private setRootN(n:number,root:boolean) {
        if(root) {
-        this.chordOptions.roots |= (1<<n);
+        this.options.chordOptions.roots |= (1<<n);
        } else {
-        this.chordOptions.roots &= ~(1<<n);
+        this.options.chordOptions.roots &= ~(1<<n);
        }
     }
 
     private getRootN(n:number) {
-      return this.chordOptions.roots & (1<<n);
+      return this.options.chordOptions.roots & (1<<n);
     }
 
     guitarPlayer : GuitarPlayer = new GuitarPlayer();
 
-    playDelay : number = 10;
+   
 
     public onChordClick(chord:Chord) {
       this.selectedChord = chord;
-      this.guitarPlayer.playNotes(chord.notes,this.playDelay);
+      this.guitarPlayer.playNotes(chord.notes,this.options.playDelay);
       this.updateNotes();
     }
 
     private loadChords() {
       let names = ["C","#C","D","bE","E","F","#F","G","bA","A","bB","B"];
-      this.chords = GuitarChordLibrary.searchNaturalToneChords(names[this.chordOptions.baseTone],this.chordOptions);
-      this.guitarBoardView.setTone(this.chordOptions.baseTone);
+      this.chords = GuitarChordLibrary.searchNaturalToneChords(names[this.options.chordOptions.baseTone],this.options.chordOptions);
+      this.guitarBoardView.setTone(this.options.chordOptions.baseTone);
       this.updateNotes();
     }
 
@@ -312,7 +327,7 @@ import ChordType from '../GuitarChord/ChordType';
       this.guitarBoardView.setVisible(false);
       this.guitarBoardView.setFocus(0);
 
-      if(this.naturalNotesVisible){
+      if(this.options.naturalNotesVisible){
         this.guitarBoardView.setVisible(true,this.guitarBoardView.getNaturalNotes());
       }
       if(this.selectedChord != null) {
@@ -330,6 +345,11 @@ import ChordType from '../GuitarChord/ChordType';
     }
 
     mounted() {
+      let params = new URL(window.location.href).searchParams;
+      let options = params.get("options");
+      if(options != null) {
+        this.optionsFromString(options);
+      }
       this.loadChords();
       (window as any)["a"] = this;
     }
