@@ -5,14 +5,9 @@
     <audio ref="wrongSound" :src="require('./assets/wrong.wav')"/> 
     <table style="margin-top:10px;">
       <tr>
-        <td><label style="font-weight: bold;">级数:</label></td>
+        <td class="itemTitle"><label style="font-weight: bold;">级数:</label></td>
         <td>
-          <div style="white-space: wrap;">
-            <div v-for="level in levelOptions" style="display:inline-block;white-space: nowrap;">
-              {{ level.name }}<input type="radio" name="level" @click="answer_level=level.index" :checked="answer_level==level.index" style="margin-right: 15px;">
-            </div>
-          </div>
-         
+          <Selector :selected="answer_level_index!=null?(1<<answer_level_index):0" @select="this.answer_level_index=$event.options[0]" :mutiple="false" :options="levelOptions.map(item=>item.name)"></Selector>
         </td>
         <td>
           <img v-if="answer_level_result" style="width:32px;height:32px;" :src="require('./assets/right.svg')">
@@ -20,13 +15,9 @@
         </td>
       </tr>
       <tr v-if="isChord2">
-        <td><label style="font-weight: bold;">音程:</label></td>
+        <td class="itemTitle"><label style="font-weight: bold;">音程:</label></td>
         <td>
-          <div style="display: inline-block;white-space:wrap;margin-top:10px;">
-            <div v-for="item in intervalOptions" style="display:inline-block;white-space:nowrap;">
-              {{ item.name }}<input type="radio" name="interval" @click="answer_interval=item.interval" :checked="answer_interval==item.interval" style="margin-right: 10px;">
-            </div>
-          </div>
+          <Selector :selected="answer_interval_index!=null?(1<<answer_interval_index):0" @select="answer_interval_index=$event.options[0]" :mutiple="false" :options="intervalOptions.map(item=>item.name)"></Selector>
         </td>
         <td>
           <img v-if="answer_interval_result" style="width:32px;height:32px;" :src="require('./assets/right.svg')">
@@ -34,13 +25,9 @@
         </td>
       </tr>
       <tr v-else>
-        <td><label style="font-weight: bold;">色彩:</label></td>
+        <td class="itemTitle"><label style="font-weight: bold;">色彩:</label></td>
         <td>
-          <div style="white-space: wrap;">
-            <div v-for="item in typeOptions" style="display:inline-block;white-space:nowrap;">
-              {{ item.name }}<input type="radio" name="color" @click="answer_type=item.type" style="margin-right: 15px;">
-            </div>
-          </div>
+          <Selector :mutiple="false" @select="answer_type_index=$event.options[0]" :selected="answer_type_index!=null?(1<<answer_type_index):0" :options="typeOptions.map(item=>item.name)"></Selector>
         </td>
         <td>
           <img v-if="answer_type_result" style="width:32px;height:32px;" :src="require('./assets/right.svg')">
@@ -63,9 +50,11 @@ import { Options, Vue } from 'vue-class-component';
 import Chord from '../GuitarChord/Chord';
 import GuitarPlayer from '../GuitarPlayer/GuitarPlayer';
 import ChordType from '../GuitarChord/ChordType';
+import Selector from './components/Selector.vue';
 
 @Options({
   components: {
+    Selector
   },
   props: ["chords"]
 })
@@ -125,9 +114,9 @@ export default class GuitarChordPracticeView extends Vue {
     this.answer_level_result = null;
     this.answer_type_result = null;
     this.answer_interval_result = null;
-    this.answer_type = null;
-    this.answer_interval = null;
-    this.answer_level = null;
+    this.answer_type_index = null;
+    this.answer_interval_index = null;
+    this.answer_level_index = null;
     this._currentIndex = Math.floor(Math.random()*this.allChords.length);
 
     this.onReplay();
@@ -150,13 +139,34 @@ export default class GuitarChordPracticeView extends Vue {
 
   static guitarPlayer = new GuitarPlayer();
 
-  answer_level : number|null = null;
-  answer_type : ChordType|null = null;
-  answer_interval : number|null = null;
+  answer_level_index : number|null = null;
+  answer_type_index : number|null = null;
+  answer_interval_index : number|null = null;
 
   answer_level_result : boolean | null = null;
   answer_type_result : boolean | null = null;
   answer_interval_result : boolean | null = null;
+
+  get answer_level() {
+    if(this.answer_level_index == null) {
+      return null;
+    }
+    return this.levelOptions[this.answer_level_index].index;
+  }
+
+  get answer_type() {
+    if(this.answer_type_index == null) {
+      return null;
+    }
+    return this.typeOptions[this.answer_type_index].type;
+  }
+
+  get answer_interval() {
+    if(this.answer_interval_index == null) {
+      return null;
+    }
+    return this.intervalOptions[this.answer_interval_index].interval;
+  }
 
   get intervalOptions() {
     let intervalSet = new Set<number>();
@@ -191,6 +201,7 @@ export default class GuitarChordPracticeView extends Vue {
         name:ChordType[this.allChords[i].type]
       });
     }
+    options.sort((left,right)=>left.type-right.type);
     return options;
   }
 
@@ -244,6 +255,14 @@ export default class GuitarChordPracticeView extends Vue {
 
 button {
   margin: 0px 3px;
+}
+
+.itemTitle {
+  vertical-align: top;
+  text-align: right;
+  padding-top: 8px;
+  padding-right: 6px;
+  width: 60px;
 }
 
 </style>
