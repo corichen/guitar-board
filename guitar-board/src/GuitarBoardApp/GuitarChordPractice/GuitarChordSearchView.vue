@@ -200,7 +200,7 @@ import ChordType from '../GuitarChord/ChordType';
 
     options = {
       boardStyle : 0,
-      naturalNotesVisible: false,
+      naturalNotesVisible: true,
       fingerVisible: true,
       playDelay : 10,
       chordOptions : new GuitarChordSearchOptions()

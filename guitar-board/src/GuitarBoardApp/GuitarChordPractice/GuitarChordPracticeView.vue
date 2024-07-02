@@ -9,7 +9,7 @@
         <td>
           <div style="white-space: wrap;">
             <div v-for="level in levelOptions" style="display:inline-block;white-space: nowrap;">
-              {{ level.name }}级<input type="radio" name="level" @click="answer_level=level.index" :checked="answer_level==level.index" style="margin-right: 15px;">
+              {{ level.name }}<input type="radio" name="level" @click="answer_level=level.index" :checked="answer_level==level.index" style="margin-right: 15px;">
             </div>
           </div>
          
@@ -180,13 +180,18 @@ export default class GuitarChordPracticeView extends Vue {
 
   get typeOptions() {
     let set = new Set();
+    let options = [];
     for(let i = 0 ; i < this.allChords.length; ++i) {
-      set.add({
+      if(set.has(this.allChords[i].type)) {
+        continue;
+      }
+      set.add(this.allChords[i].type);
+      options.push({
         type:this.allChords[i].type,
         name:ChordType[this.allChords[i].type]
       });
     }
-    return set;
+    return options;
   }
 
   get levelOptions() {
