@@ -56,7 +56,7 @@ import Selector from './components/Selector.vue';
   components: {
     Selector
   },
-  props: ["chords"]
+  props: ["chords","playDelay"]
 })
 export default class GuitarChordPracticeView extends Vue {
   mounted() { 
@@ -75,7 +75,7 @@ export default class GuitarChordPracticeView extends Vue {
     if(this.currentChord == null || this.currentChord.tone == null) {
       return;
     }
-    GuitarChordPracticeView.guitarPlayer.playNotes(this.currentChord.notes,20);
+    GuitarChordPracticeView.guitarPlayer.playNotes(this.currentChord.notes,(this as any).playDelay);
   }
 
   onConfirm() {

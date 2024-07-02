@@ -130,7 +130,7 @@
       </Dialog>
 
       <Dialog :title="'练耳'" :visible="practiceEnable" @close="practiceEnable=false">
-        <GuitarChordPracticleView ref="p" :chords="chords"></GuitarChordPracticleView>
+        <GuitarChordPracticleView :playDelay="options.playDelay" ref="p" :chords="chords"></GuitarChordPracticleView>
       </Dialog>
 
       <!--  -->
@@ -369,9 +369,10 @@ import ChordType from '../GuitarChord/ChordType';
   }
 
   .setting_title {
+    vertical-align: top;
     font-weight: bold;
     text-align: right;
-    padding: 0px 10px;
+    padding: 10px 10px;
   }
 
   .nowrap {
