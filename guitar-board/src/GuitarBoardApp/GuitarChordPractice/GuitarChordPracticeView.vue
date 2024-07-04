@@ -4,7 +4,7 @@
     <audio ref="rightSound" :src="require('./assets/right.wav')"/>
     <audio ref="wrongSound" :src="require('./assets/wrong.wav')"/> 
     <table style="margin-top:10px;">
-      <tr>
+      <tr v-if="typeProp&(1<<0)">
         <td class="itemTitle"><label style="font-weight: bold;">级数:</label></td>
         <td>
           <Selector :selected="answer_level_index!=null?(1<<answer_level_index):0" @select="this.answer_level_index=$event.options[0]" :mutiple="false" :options="levelOptions.map(item=>item.name)"></Selector>
@@ -14,7 +14,7 @@
           <img v-if="answer_level_result!=null&&!answer_level_result" style="width:32px;height:32px;" :src="require('./assets/wrong.svg')">
         </td>
       </tr>
-      <tr v-if="isChord2">
+      <tr v-if="isChord2 && (typeProp&(1<<1))">
         <td class="itemTitle"><label style="font-weight: bold;">音程:</label></td>
         <td>
           <Selector :selected="answer_interval_index!=null?(1<<answer_interval_index):0" @select="answer_interval_index=$event.options[0]" :mutiple="false" :options="intervalOptions.map(item=>item.name)"></Selector>
@@ -24,7 +24,7 @@
           <img v-if="answer_interval_result!=null&&!answer_interval_result" style="width:32px;height:32px;" :src="require('./assets/wrong.svg')">
         </td>
       </tr>
-      <tr v-else>
+      <tr v-else-if="typeProp&(1<<2)">
         <td class="itemTitle"><label style="font-weight: bold;">色彩:</label></td>
         <td>
           <Selector :mutiple="false" @select="answer_type_index=$event.options[0]" :selected="answer_type_index!=null?(1<<answer_type_index):0" :options="typeOptions.map(item=>item.name)"></Selector>
@@ -51,16 +51,21 @@ import Chord from '../GuitarChord/Chord';
 import GuitarPlayer from '../GuitarPlayer/GuitarPlayer';
 import ChordType from '../GuitarChord/ChordType';
 import Selector from './components/Selector.vue';
+import PracticeType from './PracticeType';
 
 @Options({
   components: {
     Selector
   },
-  props: ["chords","playDelay"]
+  props: ["chords","playDelay","type"]
 })
 export default class GuitarChordPracticeView extends Vue {
   mounted() { 
     this.onNext();
+  }
+
+  get typeProp() {
+    return (this as any).type as PracticeType;
   }
 
   async onPlayDo() {
@@ -83,19 +88,25 @@ export default class GuitarChordPracticeView extends Vue {
       return;
     }
     let fullRight = true;
-    this.answer_level_result = this.answer_level == this.currentChord.indexInTone;
-    if(!this.answer_level_result) {
-      fullRight = false;
-    }
-    if(this.isChord2) {
-      this.answer_interval_result = this.answer_interval == this.currentChord.interval;
-      if(!this.answer_interval_result) {
+    if(this.typeProp & (1<<PracticeType.level)) {
+      this.answer_level_result = this.answer_level == this.currentChord.indexInTone;
+      if(!this.answer_level_result) {
         fullRight = false;
       }
+    } 
+    if(this.isChord2) {
+      if(this.typeProp & (1<<PracticeType.interval)) {
+        this.answer_interval_result = this.answer_interval == this.currentChord.interval;
+        if(!this.answer_interval_result) {
+          fullRight = false;
+        }
+      }
     } else {
-      this.answer_type_result = this.answer_type == null ? false : this.currentChord.isType(this.answer_type);
-      if(!this.answer_type_result) {
-        fullRight = false;
+      if(this.typeProp & (1<<PracticeType.color)) {
+        this.answer_type_result = this.answer_type == null ? false : this.currentChord.isType(this.answer_type);
+        if(!this.answer_type_result) {
+          fullRight = false;
+        }
       }
     }
 

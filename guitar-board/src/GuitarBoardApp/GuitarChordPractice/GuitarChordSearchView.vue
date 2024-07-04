@@ -121,6 +121,14 @@
               </td>
             </tr>
             <tr>
+              <td class="setting_title">练习科目</td>
+              <td class="setting_row">
+     
+                <Selector :selected="options.practiceType" @select="options.practiceType=$event.selected" :options="practiceTypeOptions.map(item=>item.name)"></Selector>
+
+              </td>
+            </tr>
+            <tr>
               <td class="setting_title">保存选项</td>
               <td class="setting_row">
                 <a :href="`index.html?options=${optionsToString()}`" target="_blank">新链接</a>
@@ -130,7 +138,7 @@
       </Dialog>
 
       <Dialog :title="'练耳'" :visible="practiceEnable" @close="practiceEnable=false">
-        <GuitarChordPracticleView :playDelay="options.playDelay" ref="p" :chords="chords"></GuitarChordPracticleView>
+        <GuitarChordPracticleView :type="options.practiceType" :playDelay="options.playDelay" ref="p" :chords="chords"></GuitarChordPracticleView>
       </Dialog>
 
       <!--  -->
@@ -155,6 +163,7 @@ import GuitarChordPracticleView from "./GuitarChordPracticeView.vue";
 import Dialog from "./components/Dialog.vue";
 import Selector from "./components/Selector.vue";
 import ChordType from '../GuitarChord/ChordType';
+import PracticeType from './PracticeType';
 
   @Options({
     components: {
@@ -203,7 +212,23 @@ import ChordType from '../GuitarChord/ChordType';
       naturalNotesVisible: true,
       fingerVisible: true,
       playDelay : 10,
+      practiceType : 0xFFFF,
       chordOptions : new GuitarChordSearchOptions()
+    }
+
+    get practiceTypeOptions() {
+      return [
+        {
+          type: PracticeType.level,
+          name: "级数"
+        },{
+          type: PracticeType.interval,
+          name: "音程"
+        },{
+          type: PracticeType.color,
+          name: "色彩"
+        }
+      ]
     }
 
     optionsToString() {
